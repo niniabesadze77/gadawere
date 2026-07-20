@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiSolveMathRouteImport } from './routes/api/solve-math'
+import { Route as ApiImproveEssayRouteImport } from './routes/api/improve-essay'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSolveMathRoute = ApiSolveMathRouteImport.update({
+  id: '/api/solve-math',
+  path: '/api/solve-math',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiImproveEssayRoute = ApiImproveEssayRouteImport.update({
+  id: '/api/improve-essay',
+  path: '/api/improve-essay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/improve-essay': typeof ApiImproveEssayRoute
+  '/api/solve-math': typeof ApiSolveMathRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/improve-essay': typeof ApiImproveEssayRoute
+  '/api/solve-math': typeof ApiSolveMathRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/improve-essay': typeof ApiImproveEssayRoute
+  '/api/solve-math': typeof ApiSolveMathRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/api/improve-essay' | '/api/solve-math'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/api/improve-essay' | '/api/solve-math'
+  id: '__root__' | '/' | '/api/improve-essay' | '/api/solve-math'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiImproveEssayRoute: typeof ApiImproveEssayRoute
+  ApiSolveMathRoute: typeof ApiSolveMathRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,22 +68,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/solve-math': {
+      id: '/api/solve-math'
+      path: '/api/solve-math'
+      fullPath: '/api/solve-math'
+      preLoaderRoute: typeof ApiSolveMathRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/improve-essay': {
+      id: '/api/improve-essay'
+      path: '/api/improve-essay'
+      fullPath: '/api/improve-essay'
+      preLoaderRoute: typeof ApiImproveEssayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiImproveEssayRoute: ApiImproveEssayRoute,
+  ApiSolveMathRoute: ApiSolveMathRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
