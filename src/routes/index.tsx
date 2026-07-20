@@ -65,14 +65,32 @@ function Home() {
             : "top-6 scale-100 duration-[1400ms]"
         }`}
       >
-        <div className="relative">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (phase === "ready") setSelected(null);
+          }}
+          className="relative block cursor-pointer"
+        >
           <div className="absolute inset-0 -z-10 animate-pulse rounded-full bg-gradient-to-r from-violet-400 to-blue-400 opacity-40 blur-2xl" />
-          <div className="rounded-full border border-violet-200 bg-white/80 px-5 py-2 shadow-lg shadow-violet-200/50 backdrop-blur">
+          <div className="rounded-full border border-violet-200 bg-white/80 px-5 py-2 shadow-lg shadow-violet-200/50 backdrop-blur transition active:scale-95">
             <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-2xl font-black tracking-tight text-transparent">
               gadawere.
             </span>
           </div>
-        </div>
+        </button>
+        {phase === "ready" && !selected && (
+          <a
+            href="mailto:gadatseresupport@gmail.com"
+            onClick={(e) => e.stopPropagation()}
+            className="mt-3 flex animate-[fadeUp_0.7s_ease-out_both] items-center justify-center gap-1.5 rounded-full border border-violet-200 bg-white/70 px-3 py-1 text-xs font-semibold text-violet-700 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:text-blue-600"
+            style={{ animationDelay: "800ms" }}
+          >
+            <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-[9px] font-bold text-white">?</span>
+            support
+          </a>
+        )}
       </div>
 
       {/* Intro hint */}
