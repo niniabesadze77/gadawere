@@ -35,7 +35,7 @@ export const Route = createFileRoute("/api/practice-generate")({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "openai/gpt-5.5",
+            model: "google/gemini-2.5-flash",
             messages: [
               { role: "system", content: system },
               { role: "user", content: "დააგენერირე ტესტი JSON-ით." },
