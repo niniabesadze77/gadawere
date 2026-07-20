@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -9,13 +11,10 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "სასკოლო AI ასისტენტი ქართულ ენაზე – ქართული, მათემატიკა, ფიზიკა, ქიმია, გეოგრაფია.",
+          "სასკოლო AI ასისტენტი ქართულ ენაზე – ქართული, მათემატიკა, ვარჯიშის ზონა.",
       },
       { property: "og:title", content: "gadawere. – სასკოლო AI ასისტენტი" },
-      {
-        property: "og:description",
-        content: "სწავლა მარტივია, როცა გაქვს AI.",
-      },
+      { property: "og:description", content: "სწავლა მარტივია, როცა გაქვს AI." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -32,8 +31,8 @@ const SUBJECTS: {
   active: boolean;
   desc: string;
 }[] = [
-  { id: "georgian", label: "ქართული", emoji: "📖", active: true, desc: "ტექსტის შემოწმება" },
-  { id: "math", label: "მათემატიკა", emoji: "🧮", active: true, desc: "AI + კალკულატორი + ფოტო" },
+  { id: "georgian", label: "ქართული", emoji: "📖", active: true, desc: "ტექსტი + ვარჯიში" },
+  { id: "math", label: "მათემატიკა", emoji: "🧮", active: true, desc: "AI + კალკ. + ვარჯიში" },
   { id: "physics", label: "ფიზიკა", emoji: "⚛️", active: false, desc: "მალე" },
   { id: "geography", label: "გეოგრაფია", emoji: "🌍", active: false, desc: "მალე" },
   { id: "chemistry", label: "ქიმია", emoji: "🧪", active: false, desc: "მალე" },
@@ -43,13 +42,16 @@ function Home() {
   const [phase, setPhase] = useState<"intro" | "ready">("intro");
   const [selected, setSelected] = useState<Subject | null>(null);
 
-  useEffect(() => {
-    const t = setTimeout(() => setPhase("ready"), 1700);
-    return () => clearTimeout(t);
-  }, []);
+  function advance() {
+    if (phase === "intro") setPhase("ready");
+  }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-violet-50 to-blue-50 text-slate-900">
+    <div
+      onClick={advance}
+      onTouchStart={advance}
+      className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-violet-50 to-blue-50 text-slate-900"
+    >
       {/* Decorative blobs */}
       <div className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-violet-300/40 blur-3xl" />
       <div className="pointer-events-none absolute -right-24 top-40 h-72 w-72 rounded-full bg-blue-300/40 blur-3xl" />
@@ -57,10 +59,10 @@ function Home() {
 
       {/* Logo */}
       <div
-        className={`fixed left-1/2 z-30 -translate-x-1/2 transition-all duration-[900ms] ease-[cubic-bezier(0.6,-0.05,0.2,1.2)] ${
+        className={`fixed left-1/2 z-30 -translate-x-1/2 transition-all ease-[cubic-bezier(0.22,1,0.36,1)] ${
           phase === "intro"
-            ? "top-1/2 -translate-y-1/2 scale-150"
-            : "top-6 scale-100"
+            ? "top-1/2 -translate-y-1/2 scale-150 duration-700"
+            : "top-6 scale-100 duration-[1400ms]"
         }`}
       >
         <div className="relative">
@@ -73,11 +75,21 @@ function Home() {
         </div>
       </div>
 
+      {/* Intro hint */}
+      {phase === "intro" && (
+        <div className="fixed inset-x-0 bottom-16 z-20 text-center">
+          <p className="animate-pulse text-sm font-semibold text-violet-600">
+            შეეხე ეკრანს დასაწყებად
+          </p>
+        </div>
+      )}
+
       <main className="relative mx-auto max-w-3xl px-4 pb-16 pt-28">
-        {/* Ready content – fade in after intro */}
         <div
-          className={`transition-all duration-700 ${
-            phase === "ready" ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+          className={`transition-all duration-[900ms] ease-out ${
+            phase === "ready"
+              ? "translate-y-0 opacity-100 delay-500"
+              : "pointer-events-none translate-y-6 opacity-0"
           }`}
         >
           {!selected ? (
@@ -89,13 +101,40 @@ function Home() {
 
         <footer
           className={`mt-16 text-center text-xs text-slate-500 transition-opacity duration-700 ${
-            phase === "ready" ? "opacity-100" : "opacity-0"
+            phase === "ready" ? "opacity-100 delay-700" : "opacity-0"
           }`}
         >
           © gadawere. · სასკოლო AI ასისტენტი
         </footer>
       </main>
+
+      <GlobalAnim />
     </div>
+  );
+}
+
+function GlobalAnim() {
+  return (
+    <style>{`
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(14px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes fadeIn { from {opacity:0} to {opacity:1} }
+      @keyframes pop {
+        0% { transform: scale(0.9); opacity: 0; }
+        60% { transform: scale(1.04); opacity: 1; }
+        100% { transform: scale(1); }
+      }
+      @keyframes typewriter {
+        from { clip-path: inset(0 100% 0 0); }
+        to { clip-path: inset(0 0 0 0); }
+      }
+      @keyframes shine {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+      }
+    `}</style>
   );
 }
 
@@ -132,21 +171,12 @@ function SubjectPicker({ onPick }: { onPick: (s: Subject) => void }) {
               <div className="text-4xl transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
                 {s.emoji}
               </div>
-              <div className="mt-3 text-lg font-black text-slate-900">
-                {s.label}
-              </div>
+              <div className="mt-3 text-lg font-black text-slate-900">{s.label}</div>
               <div className="mt-1 text-xs text-slate-500">{s.desc}</div>
             </div>
           </button>
         ))}
       </div>
-
-      <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(12px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }
@@ -173,7 +203,7 @@ function SubjectView({
         </span>
       </h2>
 
-      {subject === "georgian" && <GeorgianChecker />}
+      {subject === "georgian" && <GeorgianHub />}
       {subject === "math" && <MathHub />}
     </div>
   );
@@ -181,11 +211,33 @@ function SubjectView({
 
 /* ---------------- Georgian ---------------- */
 
+function GeorgianHub() {
+  const [mode, setMode] = useState<"checker" | "practice">("checker");
+  return (
+    <Panel>
+      <div className="flex gap-1.5 rounded-2xl border border-violet-100 bg-violet-50/60 p-1">
+        <SegBtn active={mode === "checker"} onClick={() => setMode("checker")}>
+          ✍️ შემოწმება
+        </SegBtn>
+        <SegBtn active={mode === "practice"} onClick={() => setMode("practice")}>
+          🏋️ ვარჯიში
+        </SegBtn>
+      </div>
+      <div className="mt-4 animate-[fadeIn_0.4s_ease-out_both]" key={mode}>
+        {mode === "checker" && <GeorgianChecker />}
+        {mode === "practice" && <PracticeZone subject="georgian" />}
+      </div>
+    </Panel>
+  );
+}
+
 function GeorgianChecker() {
   const [text, setText] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const parsed = useMemo(() => splitCorrected(result), [result]);
 
   async function submit() {
     if (!text.trim()) return;
@@ -209,18 +261,17 @@ function GeorgianChecker() {
   }
 
   return (
-    <Panel>
-      {/* User bubble input */}
+    <div className="animate-[fadeUp_0.4s_ease-out_both]">
       <div className="flex justify-end">
         <div className="max-w-full flex-1 rounded-3xl rounded-br-md border border-violet-200 bg-gradient-to-br from-violet-100 to-blue-50 p-3 shadow-sm">
           <label className="block px-1 pb-1 text-xs font-semibold text-violet-700">
-            📝 ჩააკოპირე შენი ტექსტი
+            📝 შენი ტექსტი
           </label>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={6}
-            placeholder="დაწერე ან ჩააკოპირე ტექსტი აქ..."
+            placeholder="ჩაწერე შენი ტექსტი აქ..."
             className="w-full resize-y rounded-2xl border border-white/60 bg-white/80 p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-400 focus:outline-none"
           />
           <button
@@ -235,47 +286,82 @@ function GeorgianChecker() {
 
       {error && <ErrorNote text={error} />}
 
-      {/* AI bubble */}
-      {result && (
-        <div className="mt-4 flex justify-start animate-[fadeUp_0.4s_ease-out_both]">
-          <div className="flex-1 rounded-3xl rounded-bl-md border border-violet-200 bg-white p-4 shadow-md shadow-violet-100">
-            <div className="mb-2 flex items-center gap-2 text-xs font-bold text-violet-700">
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-white">
-                ✨
-              </span>
-              gadawere AI
-            </div>
-            <div className="prose prose-sm max-w-none prose-headings:text-violet-700 prose-strong:text-blue-700">
-              <ReactMarkdown>{result}</ReactMarkdown>
-            </div>
+      {loading && (
+        <div className="mt-4 flex justify-start">
+          <div className="flex gap-1 rounded-2xl rounded-bl-md border border-violet-100 bg-white px-3 py-2.5">
+            <Dot /> <Dot delay={150} /> <Dot delay={300} />
           </div>
         </div>
       )}
-    </Panel>
+
+      {result && (
+        <div className="mt-4 space-y-3">
+          <div className="animate-[fadeUp_0.4s_ease-out_both] rounded-3xl rounded-bl-md border border-violet-200 bg-white p-4 shadow-md shadow-violet-100">
+            <div className="mb-2 flex items-center gap-2 text-xs font-bold text-violet-700">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-white">
+                ✍️
+              </span>
+              შესწორებული ტექსტი
+            </div>
+            <div className="prose prose-sm max-w-none whitespace-pre-wrap text-slate-800">
+              {parsed.corrected || <span className="text-slate-400">—</span>}
+            </div>
+          </div>
+          {parsed.notes && (
+            <div
+              className="animate-[fadeUp_0.5s_ease-out_both] rounded-3xl rounded-bl-md border border-blue-200 bg-blue-50/60 p-4 shadow-md shadow-blue-100"
+              style={{ animationDelay: "250ms" }}
+            >
+              <div className="mb-2 flex items-center gap-2 text-xs font-bold text-blue-700">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-500 text-white">
+                  📌
+                </span>
+                შენიშვნები
+              </div>
+              <div className="prose prose-sm max-w-none prose-strong:text-blue-700">
+                <ReactMarkdown>{parsed.notes}</ReactMarkdown>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
+}
+
+function splitCorrected(md: string): { corrected: string; notes: string } {
+  if (!md) return { corrected: "", notes: "" };
+  // Match "### გასწორებული ტექსტი" ... "### აღმოჩენილი შეცდომები"
+  const correctedMatch = md.match(
+    /###\s*გასწორებული ტექსტი\s*\n([\s\S]*?)(?=\n###|$)/,
+  );
+  const notesMatch = md.match(/###\s*აღმოჩენილი შეცდომები\s*\n([\s\S]*)/);
+  if (correctedMatch) {
+    return {
+      corrected: correctedMatch[1].trim(),
+      notes: notesMatch ? notesMatch[1].trim() : "",
+    };
+  }
+  return { corrected: md, notes: "" };
 }
 
 /* ---------------- Math ---------------- */
 
 function MathHub() {
-  const [mode, setMode] = useState<"chat" | "calc" | "photo">("chat");
+  const [mode, setMode] = useState<"chat" | "calc" | "photo" | "practice">("chat");
   return (
     <Panel>
       <div className="flex gap-1.5 rounded-2xl border border-violet-100 bg-violet-50/60 p-1">
-        <SegBtn active={mode === "chat"} onClick={() => setMode("chat")}>
-          💬 Gemini AI
-        </SegBtn>
-        <SegBtn active={mode === "calc"} onClick={() => setMode("calc")}>
-          🔢 კალკ.
-        </SegBtn>
-        <SegBtn active={mode === "photo"} onClick={() => setMode("photo")}>
-          📸 ფოტო
-        </SegBtn>
+        <SegBtn active={mode === "chat"} onClick={() => setMode("chat")}>💬 AI</SegBtn>
+        <SegBtn active={mode === "calc"} onClick={() => setMode("calc")}>🔢 კალკ.</SegBtn>
+        <SegBtn active={mode === "photo"} onClick={() => setMode("photo")}>📸 ფოტო</SegBtn>
+        <SegBtn active={mode === "practice"} onClick={() => setMode("practice")}>🏋️</SegBtn>
       </div>
-      <div className="mt-4">
+      <div className="mt-4 animate-[fadeIn_0.4s_ease-out_both]" key={mode}>
         {mode === "chat" && <MathChat />}
         {mode === "calc" && <MathCalculator />}
         {mode === "photo" && <MathPhoto />}
+        {mode === "practice" && <PracticeZone subject="math" />}
       </div>
     </Panel>
   );
@@ -360,19 +446,13 @@ function MathChat() {
             }`}
           >
             <div
-              className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm shadow-sm ${
+              className={`max-w-[90%] rounded-2xl px-3.5 py-2.5 text-sm shadow-sm ${
                 m.role === "user"
                   ? "rounded-br-md bg-gradient-to-br from-violet-600 to-blue-600 text-white"
                   : "rounded-bl-md border border-violet-100 bg-white text-slate-800"
               }`}
             >
-              {m.role === "assistant" ? (
-                <div className="prose prose-sm max-w-none">
-                  <ReactMarkdown>{m.content}</ReactMarkdown>
-                </div>
-              ) : (
-                m.content
-              )}
+              {m.role === "assistant" ? <Markdown>{m.content}</Markdown> : m.content}
             </div>
           </div>
         ))}
@@ -439,7 +519,11 @@ function MathCalculator() {
         .replaceAll("π", "Math.PI")
         .replaceAll("√", "Math.sqrt")
         .replaceAll("^", "**");
-      if (!/^[-+*/().\d\s\w]+$/.test(sanitized.replaceAll("Math.PI", "").replaceAll("Math.sqrt", ""))) {
+      if (
+        !/^[-+*/().\d\s\w]+$/.test(
+          sanitized.replaceAll("Math.PI", "").replaceAll("Math.sqrt", ""),
+        )
+      ) {
         throw new Error("invalid");
       }
       // eslint-disable-next-line no-new-func
@@ -455,27 +539,22 @@ function MathCalculator() {
     { label: "(", onClick: () => press("(") },
     { label: ")", onClick: () => press(")") },
     { label: "⌫", onClick: back, className: "bg-violet-100 text-violet-700" },
-
     { label: "7", onClick: () => press("7") },
     { label: "8", onClick: () => press("8") },
     { label: "9", onClick: () => press("9") },
     { label: "÷", onClick: () => press("÷"), className: "bg-blue-100 text-blue-700" },
-
     { label: "4", onClick: () => press("4") },
     { label: "5", onClick: () => press("5") },
     { label: "6", onClick: () => press("6") },
     { label: "×", onClick: () => press("×"), className: "bg-blue-100 text-blue-700" },
-
     { label: "1", onClick: () => press("1") },
     { label: "2", onClick: () => press("2") },
     { label: "3", onClick: () => press("3") },
     { label: "−", onClick: () => press("−"), className: "bg-blue-100 text-blue-700" },
-
     { label: "0", onClick: () => press("0") },
     { label: ".", onClick: () => press(".") },
     { label: "π", onClick: () => press("π"), className: "bg-violet-100 text-violet-700" },
     { label: "+", onClick: () => press("+"), className: "bg-blue-100 text-blue-700" },
-
     { label: "√", onClick: () => press("√("), className: "bg-violet-100 text-violet-700" },
     { label: "^", onClick: () => press("^"), className: "bg-violet-100 text-violet-700" },
     {
@@ -600,10 +679,10 @@ function MathPhoto() {
             <span className="inline-flex h-6 w-6 animate-pulse items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-white">
               ✨
             </span>
-            Gemini AI პასუხი
+            AI პასუხი
           </div>
-          <div className="prose prose-sm max-w-none rounded-2xl border border-violet-200 bg-white p-4 shadow-md shadow-violet-100 prose-headings:text-violet-700 prose-strong:text-blue-700">
-            <ReactMarkdown>{solution}</ReactMarkdown>
+          <div className="rounded-2xl border border-violet-200 bg-white p-4 shadow-md shadow-violet-100">
+            <Markdown>{solution}</Markdown>
           </div>
         </div>
       )}
@@ -638,7 +717,439 @@ function Sparkles() {
   );
 }
 
+/* ---------------- Practice Zone ---------------- */
+
+type MathQ = {
+  id: number;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+};
+type GeoQ = {
+  id: number;
+  question: string;
+  correctAnswer: string;
+  hint: string;
+  explanation: string;
+};
+
+function PracticeZone({ subject }: { subject: "math" | "georgian" }) {
+  const [grade, setGrade] = useState<number | null>(null);
+  const [level, setLevel] = useState<number | null>(null);
+  const [state, setState] = useState<"setup" | "loading" | "quiz" | "done">("setup");
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+
+  const maxGrade = subject === "georgian" ? 12 : 12;
+
+  async function start() {
+    if (!grade || !level) return;
+    setState("loading");
+    setError(null);
+    setProgress(0);
+    // Fake progress while awaiting
+    const iv = setInterval(
+      () => setProgress((p) => (p < 92 ? p + Math.random() * 6 : p)),
+      200,
+    );
+    try {
+      const res = await fetch("/api/practice-generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subject, grade, level }),
+      });
+      if (!res.ok) throw new Error((await res.text()) || `შეცდომა (${res.status})`);
+      const data = (await res.json()) as { questions: any[] };
+      const qs = (data.questions || []).slice(0, 10);
+      if (qs.length === 0) throw new Error("კითხვები ვერ დაგენერირდა");
+      setQuestions(qs);
+      setProgress(100);
+      setTimeout(() => setState("quiz"), 300);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "შეცდომა");
+      setState("setup");
+    } finally {
+      clearInterval(iv);
+    }
+  }
+
+  function reset() {
+    setQuestions([]);
+    setState("setup");
+    setProgress(0);
+  }
+
+  if (state === "loading") return <LoadingCircle percent={progress} />;
+  if (state === "quiz")
+    return (
+      <Quiz
+        subject={subject}
+        questions={questions}
+        onFinish={() => setState("done")}
+        onExit={reset}
+      />
+    );
+  if (state === "done")
+    return <QuizDone onAgain={reset} />;
+
+  return (
+    <div className="animate-[fadeUp_0.4s_ease-out_both] space-y-4">
+      <div>
+        <div className="mb-2 text-xs font-bold text-violet-700">📚 კლასი</div>
+        <div className="grid grid-cols-6 gap-1.5">
+          {Array.from({ length: maxGrade }, (_, i) => i + 1).map((g) => (
+            <button
+              key={g}
+              onClick={() => setGrade(g)}
+              className={`rounded-xl border py-2 text-sm font-bold transition active:scale-90 ${
+                grade === g
+                  ? "border-violet-500 bg-gradient-to-br from-violet-600 to-blue-600 text-white shadow-md shadow-violet-300"
+                  : "border-violet-200 bg-white text-slate-700 hover:border-violet-400"
+              }`}
+            >
+              {g}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <div className="mb-2 text-xs font-bold text-violet-700">⚡ სირთულის დონე (1–10)</div>
+        <div className="grid grid-cols-5 gap-1.5">
+          {Array.from({ length: 10 }, (_, i) => i + 1).map((l) => (
+            <button
+              key={l}
+              onClick={() => setLevel(l)}
+              className={`rounded-xl border py-2 text-sm font-bold transition active:scale-90 ${
+                level === l
+                  ? "border-blue-500 bg-gradient-to-br from-blue-500 to-violet-500 text-white shadow-md shadow-blue-300"
+                  : "border-blue-200 bg-white text-slate-700 hover:border-blue-400"
+              }`}
+            >
+              {l}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {error && <ErrorNote text={error} />}
+
+      <button
+        onClick={start}
+        disabled={!grade || !level}
+        className="w-full rounded-2xl bg-gradient-to-r from-violet-600 to-blue-600 px-4 py-3 text-sm font-bold text-white shadow-md shadow-violet-300 transition hover:brightness-110 active:scale-95 disabled:opacity-50"
+      >
+        🚀 დაიწყე ვარჯიში
+      </button>
+    </div>
+  );
+}
+
+function LoadingCircle({ percent }: { percent: number }) {
+  const r = 46;
+  const c = 2 * Math.PI * r;
+  const off = c - (percent / 100) * c;
+  return (
+    <div className="flex flex-col items-center justify-center py-10 animate-[fadeIn_0.3s_ease-out_both]">
+      <div className="relative h-32 w-32">
+        <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
+          <circle
+            cx="60"
+            cy="60"
+            r={r}
+            stroke="#ede9fe"
+            strokeWidth="10"
+            fill="none"
+          />
+          <circle
+            cx="60"
+            cy="60"
+            r={r}
+            stroke="url(#lg)"
+            strokeWidth="10"
+            fill="none"
+            strokeLinecap="round"
+            strokeDasharray={c}
+            strokeDashoffset={off}
+            style={{ transition: "stroke-dashoffset 300ms ease-out" }}
+          />
+          <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#7c3aed" />
+              <stop offset="100%" stopColor="#2563eb" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-lg font-black text-violet-700">
+            {Math.round(percent)}%
+          </span>
+        </div>
+      </div>
+      <p className="mt-4 text-sm font-bold text-violet-700">იტვირთება...</p>
+    </div>
+  );
+}
+
+function QuizDone({ onAgain }: { onAgain: () => void }) {
+  return (
+    <div className="flex flex-col items-center gap-4 py-8 text-center animate-[pop_0.5s_ease-out_both]">
+      <div className="text-6xl">🎉</div>
+      <h3 className="text-xl font-black text-slate-900">დაასრულე ვარჯიში!</h3>
+      <p className="text-sm text-slate-500">კარგი მუშაობა. სცადე ხელახლა უფრო მაღალ დონეზე.</p>
+      <button
+        onClick={onAgain}
+        className="rounded-2xl bg-gradient-to-r from-violet-600 to-blue-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-violet-300 transition hover:brightness-110 active:scale-95"
+      >
+        🔄 თავიდან
+      </button>
+    </div>
+  );
+}
+
+function Quiz({
+  subject,
+  questions,
+  onFinish,
+  onExit,
+}: {
+  subject: "math" | "georgian";
+  questions: any[];
+  onFinish: () => void;
+  onExit: () => void;
+}) {
+  const [idx, setIdx] = useState(0);
+  const [score, setScore] = useState(0);
+  const q = questions[idx];
+  const isLast = idx >= questions.length - 1;
+
+  function next(correct: boolean) {
+    if (correct) setScore((s) => s + 1);
+    if (isLast) onFinish();
+    else setIdx((i) => i + 1);
+  }
+
+  return (
+    <div className="animate-[fadeUp_0.4s_ease-out_both]" key={idx}>
+      <div className="mb-3 flex items-center justify-between text-xs font-bold text-slate-500">
+        <span>კითხვა {idx + 1} / {questions.length}</span>
+        <span className="text-violet-700">✅ {score}</span>
+        <button onClick={onExit} className="text-red-500 hover:underline">
+          გამოსვლა
+        </button>
+      </div>
+      <div className="mb-3 h-1.5 w-full overflow-hidden rounded-full bg-violet-100">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-violet-600 to-blue-600 transition-all duration-500"
+          style={{ width: `${((idx) / questions.length) * 100}%` }}
+        />
+      </div>
+      {subject === "math" ? (
+        <MathQuestion q={q as MathQ} onNext={next} />
+      ) : (
+        <GeorgianQuestion q={q as GeoQ} onNext={next} />
+      )}
+    </div>
+  );
+}
+
+function MathQuestion({ q, onNext }: { q: MathQ; onNext: (correct: boolean) => void }) {
+  const [picked, setPicked] = useState<number | null>(null);
+  const done = picked !== null;
+  const correct = picked === q.correctIndex;
+
+  return (
+    <div>
+      <div className="rounded-2xl border border-violet-200 bg-white p-4 shadow-sm">
+        <Markdown>{q.question}</Markdown>
+      </div>
+      <div className="mt-3 space-y-2">
+        {q.options.map((opt, i) => {
+          const isRight = i === q.correctIndex;
+          const isPicked = picked === i;
+          const state = !done
+            ? "idle"
+            : isPicked && isRight
+              ? "correct"
+              : isPicked && !isRight
+                ? "wrong"
+                : isRight
+                  ? "reveal"
+                  : "idle";
+          return (
+            <button
+              key={i}
+              disabled={done}
+              onClick={() => setPicked(i)}
+              className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left text-sm transition active:scale-[0.98] ${
+                state === "correct"
+                  ? "border-green-400 bg-green-50 text-green-800 shadow-md shadow-green-100"
+                  : state === "wrong"
+                    ? "border-red-400 bg-red-50 text-red-800 shadow-md shadow-red-100"
+                    : state === "reveal"
+                      ? "border-green-300 bg-green-50/50 text-green-700"
+                      : "border-violet-200 bg-white text-slate-800 hover:border-violet-400 hover:bg-violet-50"
+              }`}
+            >
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-100 text-xs font-black text-violet-700">
+                {String.fromCharCode(65 + i)}
+              </span>
+              <div className="flex-1"><Markdown>{opt}</Markdown></div>
+              {state === "correct" && <span>✅</span>}
+              {state === "wrong" && <span>❌</span>}
+            </button>
+          );
+        })}
+      </div>
+
+      {done && (
+        <div className="mt-4 animate-[fadeUp_0.35s_ease-out_both] space-y-2">
+          <div
+            className={`rounded-2xl border p-3 text-sm ${
+              correct
+                ? "border-green-300 bg-green-50 text-green-800"
+                : "border-red-300 bg-red-50 text-red-800"
+            }`}
+          >
+            <div className="font-bold">
+              {correct ? "🎉 სწორია! ყოჩაღ!" : "❌ არასწორია"}
+            </div>
+            <div className="mt-1 text-slate-700">
+              <Markdown>{q.explanation}</Markdown>
+            </div>
+            {!correct && (
+              <div className="mt-2 text-xs text-slate-600">
+                💪 ნუ ინერვიულებ, შემდეგზე გამოვა!
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => onNext(correct)}
+            className="w-full rounded-2xl bg-gradient-to-r from-violet-600 to-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-violet-300 transition hover:brightness-110 active:scale-95"
+          >
+            შემდეგი →
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function GeorgianQuestion({ q, onNext }: { q: GeoQ; onNext: (correct: boolean) => void }) {
+  const [answer, setAnswer] = useState("");
+  const [attempts, setAttempts] = useState(0);
+  const [wrongList, setWrongList] = useState<string[]>([]);
+  const [done, setDone] = useState<null | "correct" | "revealed">(null);
+
+  const MAX = 3;
+
+  function normalize(s: string) {
+    return s.trim().replace(/\s+/g, " ");
+  }
+
+  function check() {
+    if (done) return;
+    const a = normalize(answer);
+    if (!a) return;
+    if (a === normalize(q.correctAnswer)) {
+      setDone("correct");
+      return;
+    }
+    const nextAttempts = attempts + 1;
+    setAttempts(nextAttempts);
+    setWrongList((w) => [...w, answer]);
+    setAnswer("");
+    if (nextAttempts >= MAX) setDone("revealed");
+  }
+
+  return (
+    <div>
+      <div className="rounded-2xl border border-violet-200 bg-white p-4 shadow-sm">
+        <div className="text-xs font-bold text-blue-600">💡 მინიშნება: {q.hint}</div>
+        <div className="mt-2 whitespace-pre-wrap text-base text-slate-900">
+          {q.question}
+        </div>
+      </div>
+
+      <div className="mt-3">
+        <textarea
+          value={answer}
+          onChange={(e) => setAnswer(e.target.value)}
+          disabled={!!done}
+          rows={3}
+          placeholder="ჩაწერე გასწორებული წინადადება..."
+          className="w-full rounded-2xl border border-violet-200 bg-white p-3 text-sm focus:border-violet-400 focus:outline-none disabled:bg-slate-50"
+        />
+      </div>
+
+      <div className="mt-2 flex items-center justify-between text-xs text-slate-500">
+        <span>ცდები: {attempts} / {MAX}</span>
+        {!done && (
+          <button
+            onClick={check}
+            disabled={!answer.trim()}
+            className="rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-violet-300 transition hover:brightness-110 active:scale-95 disabled:opacity-50"
+          >
+            შემოწმება
+          </button>
+        )}
+      </div>
+
+      {wrongList.length > 0 && (
+        <div className="mt-3 space-y-1.5">
+          {wrongList.map((w, i) => (
+            <div
+              key={i}
+              className="animate-[fadeUp_0.3s_ease-out_both] rounded-xl border border-red-200 bg-red-50 p-2 text-xs text-red-700"
+            >
+              ❌ „{w}" — არასწორია
+            </div>
+          ))}
+        </div>
+      )}
+
+      {done && (
+        <div
+          className={`mt-3 animate-[fadeUp_0.35s_ease-out_both] rounded-2xl border p-3 text-sm ${
+            done === "correct"
+              ? "border-green-300 bg-green-50 text-green-800"
+              : "border-orange-300 bg-orange-50 text-orange-800"
+          }`}
+        >
+          <div className="font-bold">
+            {done === "correct" ? "🎉 სწორია! ყოჩაღ!" : "😅 ამოიწურა ცდები"}
+          </div>
+          <div className="mt-1 text-slate-700">
+            <span className="font-bold text-green-700">სწორი პასუხი: </span>
+            {q.correctAnswer}
+          </div>
+          <div className="mt-2 text-slate-600">
+            <Markdown>{q.explanation}</Markdown>
+          </div>
+          <button
+            onClick={() => onNext(done === "correct")}
+            className="mt-3 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-violet-300 transition hover:brightness-110 active:scale-95"
+          >
+            შემდეგი →
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ---------------- Shared ---------------- */
+
+function Markdown({ children }: { children: string }) {
+  return (
+    <div className="prose prose-sm max-w-none prose-headings:text-violet-700 prose-strong:text-blue-700 prose-p:my-2">
+      <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+        {children}
+      </ReactMarkdown>
+    </div>
+  );
+}
 
 function Panel({ children }: { children: React.ReactNode }) {
   return (
