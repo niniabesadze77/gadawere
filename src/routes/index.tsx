@@ -117,8 +117,54 @@ function Home() {
           )}
         </div>
 
+        {phase === "ready" && !selected && (
+          <div
+            className="mt-16 animate-[fadeUp_0.7s_ease-out_both] text-center"
+            style={{ animationDelay: "900ms" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-sm font-bold text-violet-700">გამოგვყევი</p>
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
+              <a
+                href="https://www.instagram.com/gadatsere?igsh=bWs3MjU3cW40aXZ3&utm_source=qr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-white px-3.5 py-1.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-400 hover:shadow-md active:scale-95"
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="igGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#f9ce34" />
+                      <stop offset="50%" stopColor="#ee2a7b" />
+                      <stop offset="100%" stopColor="#6228d7" />
+                    </linearGradient>
+                  </defs>
+                  <rect x="2" y="2" width="20" height="20" rx="5" fill="url(#igGrad)" />
+                  <circle cx="12" cy="12" r="4.2" fill="none" stroke="white" strokeWidth="1.8" />
+                  <circle cx="17.4" cy="6.6" r="1.2" fill="white" />
+                </svg>
+                gadatsere
+              </a>
+              <a
+                href="https://www.tiktok.com/@gadatsere?_r=1&_t=ZS-98CJf1RDGit"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-white px-3.5 py-1.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-400 hover:shadow-md active:scale-95"
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+                  <path
+                    d="M16.5 3c.4 2.1 1.7 3.7 3.9 4.1v2.6c-1.5 0-2.9-.4-4-1.1v6.7a5.6 5.6 0 1 1-5.6-5.6c.3 0 .6 0 .9.1v2.7a2.9 2.9 0 1 0 2.1 2.8V3h2.7z"
+                    fill="#000"
+                  />
+                </svg>
+                gadatsere
+              </a>
+            </div>
+          </div>
+        )}
+
         <footer
-          className={`mt-16 text-center text-xs text-slate-500 transition-opacity duration-700 ${
+          className={`mt-10 text-center text-xs text-slate-500 transition-opacity duration-700 ${
             phase === "ready" ? "opacity-100 delay-700" : "opacity-0"
           }`}
         >
