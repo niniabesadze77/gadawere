@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiSolveMathRouteImport } from './routes/api/solve-math'
+import { Route as ApiMathChatRouteImport } from './routes/api/math-chat'
 import { Route as ApiImproveEssayRouteImport } from './routes/api/improve-essay'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const ApiSolveMathRoute = ApiSolveMathRouteImport.update({
   path: '/api/solve-math',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMathChatRoute = ApiMathChatRouteImport.update({
+  id: '/api/math-chat',
+  path: '/api/math-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiImproveEssayRoute = ApiImproveEssayRouteImport.update({
   id: '/api/improve-essay',
   path: '/api/improve-essay',
@@ -32,30 +38,39 @@ const ApiImproveEssayRoute = ApiImproveEssayRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/improve-essay': typeof ApiImproveEssayRoute
+  '/api/math-chat': typeof ApiMathChatRoute
   '/api/solve-math': typeof ApiSolveMathRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/improve-essay': typeof ApiImproveEssayRoute
+  '/api/math-chat': typeof ApiMathChatRoute
   '/api/solve-math': typeof ApiSolveMathRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api/improve-essay': typeof ApiImproveEssayRoute
+  '/api/math-chat': typeof ApiMathChatRoute
   '/api/solve-math': typeof ApiSolveMathRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/improve-essay' | '/api/solve-math'
+  fullPaths: '/' | '/api/improve-essay' | '/api/math-chat' | '/api/solve-math'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/improve-essay' | '/api/solve-math'
-  id: '__root__' | '/' | '/api/improve-essay' | '/api/solve-math'
+  to: '/' | '/api/improve-essay' | '/api/math-chat' | '/api/solve-math'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/improve-essay'
+    | '/api/math-chat'
+    | '/api/solve-math'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiImproveEssayRoute: typeof ApiImproveEssayRoute
+  ApiMathChatRoute: typeof ApiMathChatRoute
   ApiSolveMathRoute: typeof ApiSolveMathRoute
 }
 
@@ -75,6 +90,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSolveMathRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/math-chat': {
+      id: '/api/math-chat'
+      path: '/api/math-chat'
+      fullPath: '/api/math-chat'
+      preLoaderRoute: typeof ApiMathChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/improve-essay': {
       id: '/api/improve-essay'
       path: '/api/improve-essay'
@@ -88,6 +110,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiImproveEssayRoute: ApiImproveEssayRoute,
+  ApiMathChatRoute: ApiMathChatRoute,
   ApiSolveMathRoute: ApiSolveMathRoute,
 }
 export const routeTree = rootRouteImport
