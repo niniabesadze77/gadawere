@@ -30,7 +30,7 @@ export const Route = createFileRoute("/api/essay-generate")({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "openai/gpt-5.5",
+            model: "google/gemini-2.5-pro",
             messages: [
               { role: "system", content: system },
               { role: "user", content: prompt },

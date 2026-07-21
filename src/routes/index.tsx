@@ -82,7 +82,9 @@ function Home() {
         </button>
         {phase === "ready" && !selected && (
           <a
-            href="mailto:gadatseresupport@gmail.com"
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=gadatseresupport@gmail.com"
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
             className="mt-2 block animate-[fadeUp_0.7s_ease-out_both] text-center text-xs font-semibold text-violet-600 transition hover:text-blue-600"
             style={{ animationDelay: "800ms" }}
@@ -171,7 +173,114 @@ function Home() {
         </footer>
       </main>
 
+      <BackgroundAnim />
       <GlobalAnim />
+    </div>
+  );
+}
+
+function BackgroundAnim() {
+  const effect = useMemo(() => {
+    const options = ["snow", "rain", "sun", "petals", "bubbles"] as const;
+    return options[Math.floor(Math.random() * options.length)];
+  }, []);
+
+  if (effect === "sun") {
+    return (
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-yellow-200/50 blur-3xl animate-[sunPulse_6s_ease-in-out_infinite]" />
+        {[...Array(12)].map((_, i) => (
+          <span
+            key={i}
+            className="absolute origin-top-right bg-gradient-to-b from-yellow-200/60 to-transparent"
+            style={{
+              top: "0px",
+              right: "0px",
+              width: "2px",
+              height: "70vh",
+              transform: `rotate(${20 + i * 6}deg)`,
+              animation: `rayFlicker 3s ${i * 0.15}s ease-in-out infinite`,
+            }}
+          />
+        ))}
+        <style>{`
+          @keyframes sunPulse { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:.8;transform:scale(1.08)} }
+          @keyframes rayFlicker { 0%,100%{opacity:.15} 50%{opacity:.6} }
+        `}</style>
+      </div>
+    );
+  }
+
+  const particleCount = effect === "rain" ? 55 : effect === "snow" ? 45 : 30;
+  const particles = Array.from({ length: particleCount }, (_, i) => ({
+    left: Math.random() * 100,
+    delay: Math.random() * 8,
+    duration:
+      effect === "rain" ? 0.7 + Math.random() * 0.8 : 6 + Math.random() * 8,
+    size:
+      effect === "snow"
+        ? 6 + Math.random() * 10
+        : effect === "petals"
+          ? 10 + Math.random() * 8
+          : effect === "bubbles"
+            ? 8 + Math.random() * 14
+            : 1 + Math.random(),
+    drift: (Math.random() - 0.5) * 60,
+    i,
+  }));
+
+  const glyph =
+    effect === "snow" ? "❄" : effect === "petals" ? "🌸" : effect === "bubbles" ? "•" : "";
+
+  return (
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+      {particles.map((p) => (
+        <span
+          key={p.i}
+          className={
+            effect === "rain"
+              ? "absolute bg-gradient-to-b from-blue-400/70 to-blue-300/0"
+              : effect === "bubbles"
+                ? "absolute rounded-full border border-blue-300/40 bg-blue-100/30"
+                : "absolute select-none"
+          }
+          style={{
+            left: `${p.left}%`,
+            top: effect === "bubbles" ? "100%" : "-10%",
+            width: effect === "rain" ? "2px" : effect === "bubbles" ? `${p.size}px` : undefined,
+            height: effect === "rain" ? `${14 + p.size * 6}px` : effect === "bubbles" ? `${p.size}px` : undefined,
+            fontSize: effect === "snow" || effect === "petals" ? `${p.size}px` : undefined,
+            color: effect === "snow" ? "rgba(148,163,255,0.75)" : effect === "petals" ? "rgba(236,72,153,0.75)" : undefined,
+            animation: `${
+              effect === "rain"
+                ? "rainFall"
+                : effect === "bubbles"
+                  ? "bubbleRise"
+                  : "flakeFall"
+            } ${p.duration}s ${p.delay}s linear infinite`,
+            ["--drift" as any]: `${p.drift}px`,
+          }}
+        >
+          {effect === "snow" || effect === "petals" ? glyph : null}
+        </span>
+      ))}
+      <style>{`
+        @keyframes rainFall {
+          0% { transform: translateY(-10vh); opacity: 0; }
+          10% { opacity: 1; }
+          100% { transform: translateY(115vh); opacity: 0; }
+        }
+        @keyframes flakeFall {
+          0% { transform: translate(0, -10vh) rotate(0deg); opacity: 0; }
+          10% { opacity: 1; }
+          100% { transform: translate(var(--drift), 115vh) rotate(360deg); opacity: 0; }
+        }
+        @keyframes bubbleRise {
+          0% { transform: translateY(0) translateX(0); opacity: 0; }
+          15% { opacity: 0.7; }
+          100% { transform: translateY(-120vh) translateX(var(--drift)); opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }
@@ -275,23 +384,23 @@ function SubjectView({
 /* ---------------- Georgian ---------------- */
 
 function GeorgianHub() {
-  const [mode, setMode] = useState<"checker" | "essay" | "practice">("checker");
+  const [mode, setMode] = useState<"essay" | "checker" | "practice">("essay");
   return (
     <Panel>
       <div className="flex gap-1.5 rounded-2xl border border-violet-100 bg-violet-50/60 p-1">
-        <SegBtn active={mode === "checker"} onClick={() => setMode("checker")}>
-          ✍️ შემოწმება
-        </SegBtn>
         <SegBtn active={mode === "essay"} onClick={() => setMode("essay")}>
           📝 ესსე
+        </SegBtn>
+        <SegBtn active={mode === "checker"} onClick={() => setMode("checker")}>
+          ✍️ შემოწმება
         </SegBtn>
         <SegBtn active={mode === "practice"} onClick={() => setMode("practice")}>
           🏋️ ვარჯიში
         </SegBtn>
       </div>
       <div className="mt-4 animate-[fadeIn_0.4s_ease-out_both]" key={mode}>
-        {mode === "checker" && <GeorgianChecker />}
         {mode === "essay" && <EssayWriter />}
+        {mode === "checker" && <GeorgianChecker />}
         {mode === "practice" && <PracticeZone subject="georgian" />}
       </div>
     </Panel>
@@ -306,12 +415,18 @@ function EssayWriter() {
   const [essay, setEssay] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
 
   async function submit() {
     if (!prompt.trim()) return;
     setLoading(true);
     setError(null);
     setEssay("");
+    setProgress(0);
+    const iv = setInterval(
+      () => setProgress((p) => (p < 92 ? p + Math.random() * 4 + 1 : p)),
+      250,
+    );
     try {
       const res = await fetch("/api/essay-generate", {
         method: "POST",
@@ -320,10 +435,13 @@ function EssayWriter() {
       });
       if (!res.ok) throw new Error((await res.text()) || `შეცდომა (${res.status})`);
       const data = (await res.json()) as { essay: string };
+      setProgress(100);
+      await new Promise((r) => setTimeout(r, 350));
       setEssay(data.essay);
     } catch (e) {
       setError(e instanceof Error ? e.message : "დაფიქსირდა შეცდომა");
     } finally {
+      clearInterval(iv);
       setLoading(false);
     }
   }
@@ -375,9 +493,16 @@ function EssayWriter() {
       {error && <ErrorNote text={error} />}
 
       {loading && (
-        <div className="flex justify-start">
-          <div className="flex gap-1 rounded-2xl border border-violet-100 bg-white px-3 py-2.5">
-            <Dot /> <Dot delay={150} /> <Dot delay={300} />
+        <div className="animate-[fadeIn_0.3s_ease-out_both] rounded-2xl border border-violet-200 bg-white p-4 shadow-sm">
+          <div className="mb-2 flex items-center justify-between text-xs font-bold text-violet-700">
+            <span>✍️ ვწერ შენს ესსეს...</span>
+            <span>{Math.round(progress)}%</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-violet-100">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-violet-600 via-blue-500 to-violet-600 bg-[length:200%_100%] animate-[shine_2s_linear_infinite] transition-all duration-300 ease-out"
+              style={{ width: `${progress}%` }}
+            />
           </div>
         </div>
       )}
