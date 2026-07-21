@@ -179,6 +179,112 @@ function Home() {
   );
 }
 
+function BackgroundAnim() {
+  const effect = useMemo(() => {
+    const options = ["snow", "rain", "sun", "petals", "bubbles"] as const;
+    return options[Math.floor(Math.random() * options.length)];
+  }, []);
+
+  if (effect === "sun") {
+    return (
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-yellow-200/50 blur-3xl animate-[sunPulse_6s_ease-in-out_infinite]" />
+        {[...Array(12)].map((_, i) => (
+          <span
+            key={i}
+            className="absolute origin-top-right bg-gradient-to-b from-yellow-200/60 to-transparent"
+            style={{
+              top: "0px",
+              right: "0px",
+              width: "2px",
+              height: "70vh",
+              transform: `rotate(${20 + i * 6}deg)`,
+              animation: `rayFlicker 3s ${i * 0.15}s ease-in-out infinite`,
+            }}
+          />
+        ))}
+        <style>{`
+          @keyframes sunPulse { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:.8;transform:scale(1.08)} }
+          @keyframes rayFlicker { 0%,100%{opacity:.15} 50%{opacity:.6} }
+        `}</style>
+      </div>
+    );
+  }
+
+  const particleCount = effect === "rain" ? 55 : effect === "snow" ? 45 : 30;
+  const particles = Array.from({ length: particleCount }, (_, i) => ({
+    left: Math.random() * 100,
+    delay: Math.random() * 8,
+    duration:
+      effect === "rain" ? 0.7 + Math.random() * 0.8 : 6 + Math.random() * 8,
+    size:
+      effect === "snow"
+        ? 6 + Math.random() * 10
+        : effect === "petals"
+          ? 10 + Math.random() * 8
+          : effect === "bubbles"
+            ? 8 + Math.random() * 14
+            : 1 + Math.random(),
+    drift: (Math.random() - 0.5) * 60,
+    i,
+  }));
+
+  const glyph =
+    effect === "snow" ? "❄" : effect === "petals" ? "🌸" : effect === "bubbles" ? "•" : "";
+
+  return (
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+      {particles.map((p) => (
+        <span
+          key={p.i}
+          className={
+            effect === "rain"
+              ? "absolute bg-gradient-to-b from-blue-400/70 to-blue-300/0"
+              : effect === "bubbles"
+                ? "absolute rounded-full border border-blue-300/40 bg-blue-100/30"
+                : "absolute select-none"
+          }
+          style={{
+            left: `${p.left}%`,
+            top: effect === "bubbles" ? "100%" : "-10%",
+            width: effect === "rain" ? "2px" : effect === "bubbles" ? `${p.size}px` : undefined,
+            height: effect === "rain" ? `${14 + p.size * 6}px` : effect === "bubbles" ? `${p.size}px` : undefined,
+            fontSize: effect === "snow" || effect === "petals" ? `${p.size}px` : undefined,
+            color: effect === "snow" ? "rgba(148,163,255,0.75)" : effect === "petals" ? "rgba(236,72,153,0.75)" : undefined,
+            animation: `${
+              effect === "rain"
+                ? "rainFall"
+                : effect === "bubbles"
+                  ? "bubbleRise"
+                  : "flakeFall"
+            } ${p.duration}s ${p.delay}s linear infinite`,
+            ["--drift" as any]: `${p.drift}px`,
+          }}
+        >
+          {effect === "snow" || effect === "petals" ? glyph : null}
+        </span>
+      ))}
+      <style>{`
+        @keyframes rainFall {
+          0% { transform: translateY(-10vh); opacity: 0; }
+          10% { opacity: 1; }
+          100% { transform: translateY(115vh); opacity: 0; }
+        }
+        @keyframes flakeFall {
+          0% { transform: translate(0, -10vh) rotate(0deg); opacity: 0; }
+          10% { opacity: 1; }
+          100% { transform: translate(var(--drift), 115vh) rotate(360deg); opacity: 0; }
+        }
+        @keyframes bubbleRise {
+          0% { transform: translateY(0) translateX(0); opacity: 0; }
+          15% { opacity: 0.7; }
+          100% { transform: translateY(-120vh) translateX(var(--drift)); opacity: 0; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 function GlobalAnim() {
   return (
     <style>{`
