@@ -84,10 +84,9 @@ function Home() {
           <a
             href="mailto:gadatseresupport@gmail.com"
             onClick={(e) => e.stopPropagation()}
-            className="mt-3 flex animate-[fadeUp_0.7s_ease-out_both] items-center justify-center gap-1.5 rounded-full border border-violet-200 bg-white/70 px-3 py-1 text-xs font-semibold text-violet-700 shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:text-blue-600"
+            className="mt-2 block animate-[fadeUp_0.7s_ease-out_both] text-center text-xs font-semibold text-violet-600 transition hover:text-blue-600"
             style={{ animationDelay: "800ms" }}
           >
-            <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-[9px] font-bold text-white">?</span>
             support
           </a>
         )}
