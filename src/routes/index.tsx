@@ -277,23 +277,23 @@ function SubjectView({
 /* ---------------- Georgian ---------------- */
 
 function GeorgianHub() {
-  const [mode, setMode] = useState<"checker" | "essay" | "practice">("checker");
+  const [mode, setMode] = useState<"essay" | "checker" | "practice">("essay");
   return (
     <Panel>
       <div className="flex gap-1.5 rounded-2xl border border-violet-100 bg-violet-50/60 p-1">
-        <SegBtn active={mode === "checker"} onClick={() => setMode("checker")}>
-          ✍️ შემოწმება
-        </SegBtn>
         <SegBtn active={mode === "essay"} onClick={() => setMode("essay")}>
           📝 ესსე
+        </SegBtn>
+        <SegBtn active={mode === "checker"} onClick={() => setMode("checker")}>
+          ✍️ შემოწმება
         </SegBtn>
         <SegBtn active={mode === "practice"} onClick={() => setMode("practice")}>
           🏋️ ვარჯიში
         </SegBtn>
       </div>
       <div className="mt-4 animate-[fadeIn_0.4s_ease-out_both]" key={mode}>
-        {mode === "checker" && <GeorgianChecker />}
         {mode === "essay" && <EssayWriter />}
+        {mode === "checker" && <GeorgianChecker />}
         {mode === "practice" && <PracticeZone subject="georgian" />}
       </div>
     </Panel>
