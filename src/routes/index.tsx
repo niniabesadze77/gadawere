@@ -276,12 +276,15 @@ function SubjectView({
 /* ---------------- Georgian ---------------- */
 
 function GeorgianHub() {
-  const [mode, setMode] = useState<"checker" | "practice">("checker");
+  const [mode, setMode] = useState<"checker" | "essay" | "practice">("checker");
   return (
     <Panel>
       <div className="flex gap-1.5 rounded-2xl border border-violet-100 bg-violet-50/60 p-1">
         <SegBtn active={mode === "checker"} onClick={() => setMode("checker")}>
           ✍️ შემოწმება
+        </SegBtn>
+        <SegBtn active={mode === "essay"} onClick={() => setMode("essay")}>
+          📝 ესსე
         </SegBtn>
         <SegBtn active={mode === "practice"} onClick={() => setMode("practice")}>
           🏋️ ვარჯიში
@@ -289,9 +292,119 @@ function GeorgianHub() {
       </div>
       <div className="mt-4 animate-[fadeIn_0.4s_ease-out_both]" key={mode}>
         {mode === "checker" && <GeorgianChecker />}
+        {mode === "essay" && <EssayWriter />}
         {mode === "practice" && <PracticeZone subject="georgian" />}
       </div>
     </Panel>
+  );
+}
+
+const WORD_OPTIONS = [100, 250, 500, 1000, 1500, 2000, 3000, 4000, 5000];
+
+function EssayWriter() {
+  const [words, setWords] = useState<number>(500);
+  const [prompt, setPrompt] = useState("");
+  const [essay, setEssay] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function submit() {
+    if (!prompt.trim()) return;
+    setLoading(true);
+    setError(null);
+    setEssay("");
+    try {
+      const res = await fetch("/api/essay-generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, words }),
+      });
+      if (!res.ok) throw new Error((await res.text()) || `შეცდომა (${res.status})`);
+      const data = (await res.json()) as { essay: string };
+      setEssay(data.essay);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "დაფიქსირდა შეცდომა");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="animate-[fadeUp_0.4s_ease-out_both] space-y-4">
+      <div className="rounded-3xl border border-violet-200 bg-gradient-to-br from-violet-100 to-blue-50 p-4 shadow-sm">
+        <label className="block px-1 pb-2 text-xs font-bold text-violet-700">
+          📏 სიტყვების რაოდენობა
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {WORD_OPTIONS.map((w, i) => (
+            <button
+              key={w}
+              onClick={() => setWords(w)}
+              style={{ animationDelay: `${i * 40}ms` }}
+              className={`animate-[pop_0.4s_ease-out_both] rounded-full border px-3.5 py-1.5 text-sm font-bold shadow-sm transition active:scale-95 ${
+                words === w
+                  ? "border-transparent bg-gradient-to-r from-violet-600 to-blue-600 text-white shadow-violet-300"
+                  : "border-violet-200 bg-white text-slate-700 hover:-translate-y-0.5 hover:border-violet-400"
+              }`}
+            >
+              {w}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-3xl border border-violet-200 bg-white p-4 shadow-sm">
+        <label className="block px-1 pb-2 text-xs font-bold text-violet-700">
+          💡 თემა / აღწერე
+        </label>
+        <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          rows={4}
+          placeholder="აღწერე რაზე გინდა ესსე... (მაგ: ჩემი საყვარელი წიგნი, ბუნების დაცვა და ა.შ.)"
+          className="w-full resize-y rounded-2xl border border-violet-100 bg-violet-50/40 p-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-400 focus:outline-none"
+        />
+        <button
+          onClick={submit}
+          disabled={loading || !prompt.trim()}
+          className="mt-3 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-violet-300 transition hover:brightness-110 active:scale-95 disabled:opacity-50"
+        >
+          {loading ? "ვწერ ესსეს..." : "✨ დამიწერე ესსე"}
+        </button>
+      </div>
+
+      {error && <ErrorNote text={error} />}
+
+      {loading && (
+        <div className="flex justify-start">
+          <div className="flex gap-1 rounded-2xl border border-violet-100 bg-white px-3 py-2.5">
+            <Dot /> <Dot delay={150} /> <Dot delay={300} />
+          </div>
+        </div>
+      )}
+
+      {essay && (
+        <div className="animate-[fadeUp_0.5s_ease-out_both] rounded-3xl border border-violet-200 bg-white p-5 shadow-md shadow-violet-100">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs font-bold text-violet-700">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-white">
+                📝
+              </span>
+              შენი ესსე
+            </div>
+            <button
+              onClick={() => navigator.clipboard?.writeText(essay)}
+              className="rounded-full border border-violet-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-violet-700 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-400 active:scale-95"
+            >
+              📋 კოპირება
+            </button>
+          </div>
+          <div className="prose prose-sm max-w-none whitespace-pre-wrap text-slate-800 prose-headings:text-slate-900">
+            <ReactMarkdown>{essay}</ReactMarkdown>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
