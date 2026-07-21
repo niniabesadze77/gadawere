@@ -82,7 +82,9 @@ function Home() {
         </button>
         {phase === "ready" && !selected && (
           <a
-            href="mailto:gadatseresupport@gmail.com"
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=gadatseresupport@gmail.com"
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
             className="mt-2 block animate-[fadeUp_0.7s_ease-out_both] text-center text-xs font-semibold text-violet-600 transition hover:text-blue-600"
             style={{ animationDelay: "800ms" }}
