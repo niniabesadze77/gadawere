@@ -308,12 +308,18 @@ function EssayWriter() {
   const [essay, setEssay] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
 
   async function submit() {
     if (!prompt.trim()) return;
     setLoading(true);
     setError(null);
     setEssay("");
+    setProgress(0);
+    const iv = setInterval(
+      () => setProgress((p) => (p < 92 ? p + Math.random() * 4 + 1 : p)),
+      250,
+    );
     try {
       const res = await fetch("/api/essay-generate", {
         method: "POST",
@@ -322,10 +328,13 @@ function EssayWriter() {
       });
       if (!res.ok) throw new Error((await res.text()) || `შეცდომა (${res.status})`);
       const data = (await res.json()) as { essay: string };
+      setProgress(100);
+      await new Promise((r) => setTimeout(r, 350));
       setEssay(data.essay);
     } catch (e) {
       setError(e instanceof Error ? e.message : "დაფიქსირდა შეცდომა");
     } finally {
+      clearInterval(iv);
       setLoading(false);
     }
   }
