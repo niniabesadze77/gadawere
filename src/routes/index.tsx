@@ -386,9 +386,16 @@ function EssayWriter() {
       {error && <ErrorNote text={error} />}
 
       {loading && (
-        <div className="flex justify-start">
-          <div className="flex gap-1 rounded-2xl border border-violet-100 bg-white px-3 py-2.5">
-            <Dot /> <Dot delay={150} /> <Dot delay={300} />
+        <div className="animate-[fadeIn_0.3s_ease-out_both] rounded-2xl border border-violet-200 bg-white p-4 shadow-sm">
+          <div className="mb-2 flex items-center justify-between text-xs font-bold text-violet-700">
+            <span>✍️ ვწერ შენს ესსეს...</span>
+            <span>{Math.round(progress)}%</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-violet-100">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-violet-600 via-blue-500 to-violet-600 bg-[length:200%_100%] animate-[shine_2s_linear_infinite] transition-all duration-300 ease-out"
+              style={{ width: `${progress}%` }}
+            />
           </div>
         </div>
       )}
