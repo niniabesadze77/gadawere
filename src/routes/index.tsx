@@ -173,6 +173,7 @@ function Home() {
         </footer>
       </main>
 
+      <BackgroundAnim />
       <GlobalAnim />
     </div>
   );
