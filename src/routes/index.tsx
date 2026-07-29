@@ -380,7 +380,10 @@ function BackgroundAnim({ effect }: { effect: Weather }) {
     }));
   }, [effect, seed]);
 
+  if (!mounted) return null;
+
   if (effect === "sun") {
+
     return (
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[radial-gradient(circle,rgba(255,236,150,0.95),rgba(255,214,102,0.45)_45%,transparent_70%)] animate-[sunPulse_7s_ease-in-out_infinite]" />
