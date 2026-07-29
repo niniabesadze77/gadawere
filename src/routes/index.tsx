@@ -38,9 +38,41 @@ const SUBJECTS: {
   { id: "chemistry", label: "ქიმია", emoji: "🧪", active: false, desc: "მალე" },
 ];
 
+const WEATHERS = [
+  { id: "snow", label: "თოვლი", icon: "❄️" },
+  { id: "rain", label: "წვიმა", icon: "🌧️" },
+  { id: "storm", label: "ჭექა-ქუხილი", icon: "⛈️" },
+  { id: "sun", label: "მზის სხივები", icon: "☀️" },
+  { id: "cherry", label: "საკურა (ფოთლები)", icon: "🌸" },
+  { id: "bubbles", label: "ბუშტუკები", icon: "🫧" },
+] as const;
+
+type Weather = (typeof WEATHERS)[number]["id"];
+
 function Home() {
   const [phase, setPhase] = useState<"intro" | "ready">("intro");
   const [selected, setSelected] = useState<Subject | null>(null);
+  const [menu, setMenu] = useState(false);
+  const [dark, setDark] = useState(false);
+  const [weather, setWeather] = useState<Weather>("snow");
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("gw-theme");
+    const savedWeather = localStorage.getItem("gw-weather") as Weather | null;
+    setDark(savedTheme === "dark");
+    if (savedWeather && WEATHERS.some((w) => w.id === savedWeather)) {
+      setWeather(savedWeather);
+    } else {
+      const pick = WEATHERS[Math.floor(Math.random() * WEATHERS.length)].id;
+      setWeather(pick);
+      localStorage.setItem("gw-weather", pick);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+    localStorage.setItem("gw-theme", dark ? "dark" : "light");
+  }, [dark]);
 
   function advance() {
     if (phase === "intro") setPhase("ready");
@@ -50,19 +82,32 @@ function Home() {
     <div
       onClick={advance}
       onTouchStart={advance}
-      className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-violet-50 to-blue-50 text-slate-900"
+      className="gw-root relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-violet-50 to-blue-50 text-slate-900"
     >
       {/* Decorative blobs */}
       <div className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-violet-300/40 blur-3xl" />
       <div className="pointer-events-none absolute -right-24 top-40 h-72 w-72 rounded-full bg-blue-300/40 blur-3xl" />
       <div className="pointer-events-none absolute bottom-0 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-fuchsia-200/40 blur-3xl" />
 
+      <SettingsMenu
+        open={menu}
+        setOpen={setMenu}
+        dark={dark}
+        setDark={setDark}
+        weather={weather}
+        setWeather={(w) => {
+          setWeather(w);
+          localStorage.setItem("gw-weather", w);
+        }}
+        visible={phase === "ready"}
+      />
+
       {/* Logo */}
       <div
-        className={`fixed left-1/2 z-30 -translate-x-1/2 transition-all ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        className={`fixed left-1/2 z-30 -translate-x-1/2 transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           phase === "intro"
-            ? "top-1/2 -translate-y-1/2 scale-150 duration-700"
-            : "top-6 scale-100 duration-[1400ms]"
+            ? "top-1/2 -translate-y-1/2 scale-150"
+            : "top-6 scale-100"
         }`}
       >
         <button
@@ -71,22 +116,19 @@ function Home() {
             e.stopPropagation();
             if (phase === "ready") setSelected(null);
           }}
-          className="relative block cursor-pointer"
+          className="relative block cursor-pointer rounded-full px-5 py-2"
         >
-          <div className="absolute inset-0 -z-10 animate-pulse rounded-full bg-gradient-to-r from-violet-400 to-blue-400 opacity-40 blur-2xl" />
-          <div className="rounded-full border border-violet-200 bg-white/80 px-5 py-2 shadow-lg shadow-violet-200/50 backdrop-blur transition active:scale-95">
-            <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-2xl font-black tracking-tight text-transparent">
-              gadawere.
-            </span>
-          </div>
+          <div className="absolute inset-0 -z-10 animate-[glowPulse_5s_ease-in-out_infinite] rounded-full bg-gradient-to-r from-violet-400 to-blue-400 opacity-40 blur-2xl" />
+          <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-2xl font-black tracking-tight text-transparent">
+            gadawere.
+          </span>
         </button>
         {phase === "ready" && !selected && (
           <a
             href="mailto:gadatseresupport@gmail.com"
             rel="noopener noreferrer"
-
             onClick={(e) => e.stopPropagation()}
-            className="mt-2 block animate-[fadeUp_0.7s_ease-out_both] text-center text-xs font-semibold text-violet-600 transition hover:text-blue-600"
+            className="mt-2 block animate-[fadeUp_0.9s_cubic-bezier(0.16,1,0.3,1)_both] text-center text-xs font-semibold text-violet-600 transition hover:text-blue-600"
             style={{ animationDelay: "800ms" }}
           >
             support
@@ -97,7 +139,7 @@ function Home() {
       {/* Intro hint */}
       {phase === "intro" && (
         <div className="fixed inset-x-0 bottom-16 z-20 text-center">
-          <p className="animate-pulse text-sm font-semibold text-violet-600">
+          <p className="animate-[breathe_2.6s_ease-in-out_infinite] text-sm font-semibold text-violet-600">
             შეეხე ეკრანს დასაწყებად
           </p>
         </div>
@@ -105,10 +147,10 @@ function Home() {
 
       <main className="relative mx-auto max-w-3xl px-4 pb-16 pt-28">
         <div
-          className={`transition-all duration-[900ms] ease-out ${
+          className={`transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
             phase === "ready"
               ? "translate-y-0 opacity-100 delay-500"
-              : "pointer-events-none translate-y-6 opacity-0"
+              : "pointer-events-none translate-y-8 opacity-0"
           }`}
         >
           {!selected ? (
@@ -120,7 +162,7 @@ function Home() {
 
         {phase === "ready" && !selected && (
           <div
-            className="mt-16 animate-[fadeUp_0.7s_ease-out_both] text-center"
+            className="mt-16 animate-[fadeUp_0.9s_cubic-bezier(0.16,1,0.3,1)_both] text-center"
             style={{ animationDelay: "900ms" }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -130,7 +172,7 @@ function Home() {
                 href="https://www.instagram.com/gadatsere?igsh=bWs3MjU3cW40aXZ3&utm_source=qr"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-white px-3.5 py-1.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-400 hover:shadow-md active:scale-95"
+                className="gw-glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all duration-500 hover:-translate-y-0.5"
               >
                 <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
                   <defs>
@@ -150,12 +192,12 @@ function Home() {
                 href="https://www.tiktok.com/@gadatsere?_r=1&_t=ZS-98CJf1RDGit"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-violet-200 bg-white px-3.5 py-1.5 text-sm font-semibold text-slate-800 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-400 hover:shadow-md active:scale-95"
+                className="gw-glass inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all duration-500 hover:-translate-y-0.5"
               >
                 <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
                   <path
                     d="M16.5 3c.4 2.1 1.7 3.7 3.9 4.1v2.6c-1.5 0-2.9-.4-4-1.1v6.7a5.6 5.6 0 1 1-5.6-5.6c.3 0 .6 0 .9.1v2.7a2.9 2.9 0 1 0 2.1 2.8V3h2.7z"
-                    fill="#000"
+                    fill="currentColor"
                   />
                 </svg>
                 gadatsere
@@ -180,112 +222,279 @@ function Home() {
         </footer>
       </main>
 
-      <BackgroundAnim />
+      <BackgroundAnim effect={weather} />
       <GlobalAnim />
     </div>
   );
 }
 
-function BackgroundAnim() {
-  const effect = useMemo(() => {
-    const options = ["snow", "rain", "sun", "petals", "bubbles"] as const;
-    return options[Math.floor(Math.random() * options.length)];
-  }, []);
+function SettingsMenu({
+  open,
+  setOpen,
+  dark,
+  setDark,
+  weather,
+  setWeather,
+  visible,
+}: {
+  open: boolean;
+  setOpen: (v: boolean) => void;
+  dark: boolean;
+  setDark: (v: boolean) => void;
+  weather: Weather;
+  setWeather: (w: Weather) => void;
+  visible: boolean;
+}) {
+  if (!visible) return null;
+  return (
+    <>
+      <button
+        type="button"
+        aria-label="მენიუ"
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen(!open);
+        }}
+        className="gw-glass fixed right-4 top-5 z-50 flex h-11 w-11 items-center justify-center rounded-2xl transition-all duration-500"
+      >
+        <span className="relative block h-4 w-5">
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className="absolute left-0 block h-[2px] w-5 rounded-full bg-current transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+              style={
+                open
+                  ? {
+                      top: "7px",
+                      transform:
+                        i === 1 ? "scaleX(0)" : `rotate(${i === 0 ? 45 : -45}deg)`,
+                      opacity: i === 1 ? 0 : 1,
+                    }
+                  : { top: `${i * 7}px` }
+              }
+            />
+          ))}
+        </span>
+      </button>
+
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen(false);
+        }}
+        className={`fixed inset-0 z-40 bg-slate-900/25 backdrop-blur-[2px] transition-opacity duration-500 ${
+          open ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      />
+
+      <aside
+        onClick={(e) => e.stopPropagation()}
+        className={`gw-panel fixed right-3 top-20 z-50 w-[min(19rem,calc(100vw-1.5rem))] rounded-3xl p-4 transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          open
+            ? "translate-x-0 opacity-100"
+            : "pointer-events-none translate-x-8 opacity-0"
+        }`}
+      >
+        <p className="text-xs font-black uppercase tracking-wider text-violet-500">
+          თემა
+        </p>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => setDark(false)}
+            data-on={!dark}
+            className="gw-opt rounded-2xl px-3 py-2.5 text-sm font-bold"
+          >
+            ☀️ ნათელი
+          </button>
+          <button
+            type="button"
+            onClick={() => setDark(true)}
+            data-on={dark}
+            className="gw-opt rounded-2xl px-3 py-2.5 text-sm font-bold"
+          >
+            🌙 მუქი
+          </button>
+        </div>
+
+        <p className="mt-5 text-xs font-black uppercase tracking-wider text-violet-500">
+          ამინდი (ფონი)
+        </p>
+        <div className="mt-2 grid gap-2">
+          {WEATHERS.map((w, i) => (
+            <button
+              key={w.id}
+              type="button"
+              onClick={() => setWeather(w.id)}
+              data-on={weather === w.id}
+              style={{ animationDelay: `${i * 45}ms` }}
+              className={`gw-opt flex items-center gap-2.5 rounded-2xl px-3 py-2.5 text-sm font-bold ${
+                open ? "animate-[fadeUp_0.5s_cubic-bezier(0.16,1,0.3,1)_both]" : ""
+              }`}
+            >
+              <span className="text-lg">{w.icon}</span>
+              {w.label}
+            </button>
+          ))}
+        </div>
+      </aside>
+    </>
+  );
+}
+
+function BackgroundAnim({ effect }: { effect: Weather }) {
+  const seed = useMemo(() => Math.random(), [effect]);
+
+  const particles = useMemo(() => {
+    const count =
+      effect === "rain" || effect === "storm"
+        ? 70
+        : effect === "snow"
+          ? 50
+          : effect === "cherry"
+            ? 26
+            : 28;
+    return Array.from({ length: count }, (_, i) => ({
+      i,
+      left: Math.random() * 100,
+      delay: Math.random() * 9,
+      duration:
+        effect === "rain" || effect === "storm"
+          ? 0.6 + Math.random() * 0.7
+          : effect === "cherry"
+            ? 9 + Math.random() * 9
+            : 7 + Math.random() * 9,
+      size:
+        effect === "snow"
+          ? 6 + Math.random() * 10
+          : effect === "cherry"
+            ? 9 + Math.random() * 9
+            : effect === "bubbles"
+              ? 8 + Math.random() * 16
+              : 1 + Math.random(),
+      drift: (Math.random() - 0.5) * 160,
+      spin: 240 + Math.random() * 480,
+    }));
+  }, [effect, seed]);
 
   if (effect === "sun") {
     return (
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-yellow-200/50 blur-3xl animate-[sunPulse_6s_ease-in-out_infinite]" />
-        {[...Array(12)].map((_, i) => (
+        <div className="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[radial-gradient(circle,rgba(255,236,150,0.95),rgba(255,214,102,0.45)_45%,transparent_70%)] animate-[sunPulse_7s_ease-in-out_infinite]" />
+        <div className="absolute -right-24 -top-24 h-[36rem] w-[36rem] animate-[sunSpin_70s_linear_infinite]">
+          {[...Array(18)].map((_, i) => (
+            <span
+              key={i}
+              className="absolute left-1/2 top-1/2 origin-top bg-[linear-gradient(to_bottom,rgba(255,226,130,0.55),rgba(255,226,130,0.08)_55%,transparent)]"
+              style={{
+                width: i % 2 ? "10px" : "22px",
+                height: "120vh",
+                transform: `translate(-50%,0) rotate(${i * 20}deg)`,
+                filter: "blur(6px)",
+                animation: `rayBreathe ${5 + (i % 5)}s ${i * 0.2}s ease-in-out infinite`,
+              }}
+            />
+          ))}
+        </div>
+        <div className="absolute inset-0 bg-[linear-gradient(200deg,rgba(255,236,170,0.30),transparent_55%)]" />
+        {[...Array(14)].map((_, i) => (
           <span
-            key={i}
-            className="absolute origin-top-right bg-gradient-to-b from-yellow-200/60 to-transparent"
+            key={`d${i}`}
+            className="absolute h-1.5 w-1.5 rounded-full bg-yellow-200/80"
             style={{
-              top: "0px",
-              right: "0px",
-              width: "2px",
-              height: "70vh",
-              transform: `rotate(${20 + i * 6}deg)`,
-              animation: `rayFlicker 3s ${i * 0.15}s ease-in-out infinite`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `dustFloat ${9 + Math.random() * 8}s ${Math.random() * 6}s ease-in-out infinite`,
             }}
           />
         ))}
         <style>{`
-          @keyframes sunPulse { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:.8;transform:scale(1.08)} }
-          @keyframes rayFlicker { 0%,100%{opacity:.15} 50%{opacity:.6} }
+          @keyframes sunPulse { 0%,100%{opacity:.75;transform:scale(1)} 50%{opacity:1;transform:scale(1.07)} }
+          @keyframes sunSpin { to { transform: rotate(360deg); } }
+          @keyframes rayBreathe { 0%,100%{opacity:.25} 50%{opacity:.75} }
+          @keyframes dustFloat { 0%,100%{transform:translate(0,0);opacity:.25} 50%{transform:translate(18px,-26px);opacity:.8} }
         `}</style>
       </div>
     );
   }
 
-  const particleCount = effect === "rain" ? 55 : effect === "snow" ? 45 : 30;
-  const particles = Array.from({ length: particleCount }, (_, i) => ({
-    left: Math.random() * 100,
-    delay: Math.random() * 8,
-    duration:
-      effect === "rain" ? 0.7 + Math.random() * 0.8 : 6 + Math.random() * 8,
-    size:
-      effect === "snow"
-        ? 6 + Math.random() * 10
-        : effect === "petals"
-          ? 10 + Math.random() * 8
-          : effect === "bubbles"
-            ? 8 + Math.random() * 14
-            : 1 + Math.random(),
-    drift: (Math.random() - 0.5) * 60,
-    i,
-  }));
-
-  const glyph =
-    effect === "snow" ? "❄" : effect === "petals" ? "🌸" : effect === "bubbles" ? "•" : "";
+  const isRain = effect === "rain" || effect === "storm";
+  const glyph = effect === "snow" ? "❄" : effect === "cherry" ? "🌸" : "";
 
   return (
     <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+      {effect === "storm" && (
+        <>
+          <div className="absolute inset-0 bg-slate-900/10" />
+          <div className="absolute inset-0 bg-white animate-[flash_9s_ease-out_infinite] opacity-0" />
+          <div
+            className="absolute inset-0 bg-white animate-[flash_13s_1.6s_ease-out_infinite] opacity-0"
+          />
+        </>
+      )}
       {particles.map((p) => (
         <span
           key={p.i}
           className={
-            effect === "rain"
-              ? "absolute bg-gradient-to-b from-blue-400/70 to-blue-300/0"
+            isRain
+              ? "absolute rounded-full bg-gradient-to-b from-sky-400/70 to-sky-300/0"
               : effect === "bubbles"
-                ? "absolute rounded-full border border-blue-300/40 bg-blue-100/30"
+                ? "absolute rounded-full border border-sky-300/40 bg-sky-100/25"
                 : "absolute select-none"
           }
           style={{
             left: `${p.left}%`,
             top: effect === "bubbles" ? "100%" : "-10%",
-            width: effect === "rain" ? "2px" : effect === "bubbles" ? `${p.size}px` : undefined,
-            height: effect === "rain" ? `${14 + p.size * 6}px` : effect === "bubbles" ? `${p.size}px` : undefined,
-            fontSize: effect === "snow" || effect === "petals" ? `${p.size}px` : undefined,
-            color: effect === "snow" ? "rgba(148,163,255,0.75)" : effect === "petals" ? "rgba(236,72,153,0.75)" : undefined,
+            width: isRain ? "1.6px" : effect === "bubbles" ? `${p.size}px` : undefined,
+            height: isRain
+              ? `${16 + p.size * 8}px`
+              : effect === "bubbles"
+                ? `${p.size}px`
+                : undefined,
+            fontSize:
+              effect === "snow" || effect === "cherry" ? `${p.size}px` : undefined,
+            color:
+              effect === "snow" ? "rgba(148,163,255,0.8)" : undefined,
             animation: `${
-              effect === "rain"
-                ? "rainFall"
-                : effect === "bubbles"
-                  ? "bubbleRise"
-                  : "flakeFall"
-            } ${p.duration}s ${p.delay}s linear infinite`,
+              isRain ? "rainFall" : effect === "bubbles" ? "bubbleRise" : effect === "cherry" ? "petalFall" : "flakeFall"
+            } ${p.duration}s ${p.delay}s ${isRain ? "linear" : "cubic-bezier(0.4,0,0.6,1)"} infinite`,
             ["--drift" as any]: `${p.drift}px`,
+            ["--spin" as any]: `${p.spin}deg`,
           }}
         >
-          {effect === "snow" || effect === "petals" ? glyph : null}
+          {glyph || null}
         </span>
       ))}
       <style>{`
         @keyframes rainFall {
-          0% { transform: translateY(-10vh); opacity: 0; }
-          10% { opacity: 1; }
-          100% { transform: translateY(115vh); opacity: 0; }
+          0% { transform: translate3d(0,-12vh,0); opacity: 0; }
+          8% { opacity: .9; }
+          100% { transform: translate3d(-6vw,115vh,0); opacity: 0; }
         }
         @keyframes flakeFall {
-          0% { transform: translate(0, -10vh) rotate(0deg); opacity: 0; }
+          0% { transform: translate3d(0,-10vh,0) rotate(0deg); opacity: 0; }
           10% { opacity: 1; }
-          100% { transform: translate(var(--drift), 115vh) rotate(360deg); opacity: 0; }
+          50% { transform: translate3d(calc(var(--drift) * .6), 55vh, 0) rotate(calc(var(--spin) * .5)); }
+          100% { transform: translate3d(var(--drift),115vh,0) rotate(var(--spin)); opacity: 0; }
+        }
+        @keyframes petalFall {
+          0% { transform: translate3d(0,-10vh,0) rotate(0deg) scale(1); opacity: 0; }
+          10% { opacity: 1; }
+          35% { transform: translate3d(calc(var(--drift) * .5), 32vh, 0) rotate(120deg) scale(.9); }
+          65% { transform: translate3d(calc(var(--drift) * -.4), 66vh, 0) rotate(240deg) scale(1.05); }
+          100% { transform: translate3d(var(--drift),115vh,0) rotate(var(--spin)) scale(.95); opacity: 0; }
         }
         @keyframes bubbleRise {
-          0% { transform: translateY(0) translateX(0); opacity: 0; }
-          15% { opacity: 0.7; }
-          100% { transform: translateY(-120vh) translateX(var(--drift)); opacity: 0; }
+          0% { transform: translate3d(0,0,0); opacity: 0; }
+          15% { opacity: .7; }
+          100% { transform: translate3d(var(--drift),-120vh,0); opacity: 0; }
+        }
+        @keyframes flash {
+          0%, 92%, 100% { opacity: 0; }
+          93% { opacity: .55; }
+          94% { opacity: .05; }
+          95% { opacity: .7; }
+          97% { opacity: 0; }
         }
       `}</style>
     </div>
@@ -296,13 +505,13 @@ function GlobalAnim() {
   return (
     <style>{`
       @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(14px); }
-        to { opacity: 1; transform: translateY(0); }
+        from { opacity: 0; transform: translate3d(0,16px,0); }
+        to { opacity: 1; transform: translate3d(0,0,0); }
       }
       @keyframes fadeIn { from {opacity:0} to {opacity:1} }
       @keyframes pop {
-        0% { transform: scale(0.9); opacity: 0; }
-        60% { transform: scale(1.04); opacity: 1; }
+        0% { transform: scale(0.92); opacity: 0; }
+        60% { transform: scale(1.03); opacity: 1; }
         100% { transform: scale(1); }
       }
       @keyframes typewriter {
@@ -315,7 +524,15 @@ function GlobalAnim() {
       }
       @keyframes floaty {
         0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-5px); }
+        50% { transform: translateY(-4px); }
+      }
+      @keyframes breathe {
+        0%, 100% { opacity: .55; transform: scale(.99); }
+        50% { opacity: 1; transform: scale(1.01); }
+      }
+      @keyframes glowPulse {
+        0%, 100% { opacity: .28; transform: scale(1); }
+        50% { opacity: .5; transform: scale(1.08); }
       }
       @keyframes sheen {
         0% { transform: translateX(-120%) skewX(-20deg); }
@@ -323,11 +540,11 @@ function GlobalAnim() {
       }
       @keyframes sparkle {
         0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
-        50% { opacity: .5; transform: scale(1.25) rotate(18deg); }
+        50% { opacity: .55; transform: scale(1.2) rotate(16deg); }
       }
       @keyframes sheetUp {
-        from { opacity: 0; transform: translateY(40px) scale(.97); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
+        from { opacity: 0; transform: translate3d(0,44px,0) scale(.97); }
+        to { opacity: 1; transform: translate3d(0,0,0) scale(1); }
       }
     `}</style>
   );
@@ -382,27 +599,35 @@ function InstallApp() {
 
   return (
     <div
-      className="mt-10 animate-[fadeUp_0.7s_ease-out_both] text-center"
+      className="mt-8 animate-[fadeUp_0.9s_cubic-bezier(0.16,1,0.3,1)_both] text-center"
       style={{ animationDelay: "1000ms" }}
     >
       <button
         type="button"
         onClick={handleClick}
-        className="group relative inline-flex animate-[floaty_3s_ease-in-out_infinite] items-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-violet-600 via-fuchsia-500 to-blue-600 px-6 py-3 text-sm font-black text-white shadow-lg shadow-violet-400/40 transition-transform duration-300 hover:scale-105 active:scale-95"
+        className="gw-glass group inline-flex items-center gap-2.5 rounded-full py-2.5 pl-2.5 pr-5 text-sm font-semibold transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5"
       >
-        <span className="pointer-events-none absolute inset-y-0 left-0 w-1/3 animate-[sheen_2.4s_ease-in-out_infinite] bg-white/30 blur-md" />
-        <span className="relative">გადმოწერე ჩვენი აპი</span>
-        <span className="relative animate-[sparkle_1.6s_ease-in-out_infinite]">✨</span>
+        <img
+          src="/pwa-icon-512.png"
+          alt=""
+          width={26}
+          height={26}
+          className="h-[26px] w-[26px] rounded-lg opacity-90 transition-transform duration-500 group-hover:scale-105"
+        />
+        <span>გადმოწერე ჩვენი აპი</span>
+        <span className="text-xs opacity-60 transition-transform duration-500 group-hover:translate-x-0.5">
+          →
+        </span>
       </button>
 
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-3 backdrop-blur-sm animate-[fadeIn_0.25s_ease-out_both] sm:items-center"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/35 p-3 backdrop-blur-sm animate-[fadeIn_0.35s_ease-out_both] sm:items-center"
           onClick={() => setOpen(false)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md animate-[sheetUp_0.4s_cubic-bezier(0.22,1,0.36,1)_both] rounded-3xl border border-violet-200 bg-white p-5 text-left shadow-2xl"
+            className="gw-panel w-full max-w-md animate-[sheetUp_0.55s_cubic-bezier(0.16,1,0.3,1)_both] rounded-3xl p-5 text-left"
           >
             <div className="flex items-center gap-3">
               <img
@@ -414,30 +639,27 @@ function InstallApp() {
                 className="h-12 w-12 rounded-xl shadow-md"
               />
               <div>
-                <p className="text-base font-black text-slate-900">გადმოწერე ჩვენი აპი ✨</p>
-                <p className="text-xs text-slate-500">დაამატე მთავარ ეკრანზე — მუშაობს iOS-სა და Android-ზე</p>
+                <p className="text-base font-black">გადმოწერე ჩვენი აპი</p>
+                <p className="text-xs opacity-60">დაამატე მთავარ ეკრანზე — iOS და Android</p>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="ml-auto rounded-full px-2 py-1 text-lg text-slate-400 transition hover:text-slate-700"
+                className="gw-glass ml-auto flex h-8 w-8 items-center justify-center rounded-full text-sm"
                 aria-label="დახურვა"
               >
                 ✕
               </button>
             </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-2 rounded-full bg-violet-50 p-1">
+            <div className="mt-4 grid grid-cols-2 gap-2 rounded-full p-1">
               {(["android", "ios"] as const).map((t) => (
                 <button
                   key={t}
                   type="button"
                   onClick={() => setTab(t)}
-                  className={`rounded-full px-3 py-2 text-sm font-bold transition-all duration-300 ${
-                    tab === t
-                      ? "bg-gradient-to-r from-violet-600 to-blue-600 text-white shadow"
-                      : "text-violet-700 hover:bg-white"
-                  }`}
+                  data-on={tab === t}
+                  className="gw-opt rounded-full px-3 py-2 text-sm font-bold"
                 >
                   {t === "android" ? "🤖 Android" : "🍎 iPhone / iPad"}
                 </button>
@@ -461,13 +683,13 @@ function InstallApp() {
               ).map((step, i) => (
                 <li
                   key={i}
-                  style={{ animationDelay: `${i * 90}ms` }}
-                  className="flex animate-[fadeUp_0.45s_ease-out_both] items-start gap-3 rounded-2xl border border-violet-100 bg-violet-50/50 p-3"
+                  style={{ animationDelay: `${i * 110}ms` }}
+                  className="gw-glass flex animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_both] items-start gap-3 rounded-2xl p-3"
                 >
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-violet-600 to-blue-600 text-xs font-black text-white">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-violet-500 to-blue-500 text-xs font-black text-white">
                     {i + 1}
                   </span>
-                  <span className="text-sm font-medium text-slate-700">{step}</span>
+                  <span className="text-sm font-medium">{step}</span>
                 </li>
               ))}
             </ol>
