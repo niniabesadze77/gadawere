@@ -82,9 +82,9 @@ function Home() {
         </button>
         {phase === "ready" && !selected && (
           <a
-            href="https://mail.google.com/mail/?view=cm&fs=1&to=gadatseresupport@gmail.com"
-            target="_blank"
+            href="mailto:gadatseresupport@gmail.com"
             rel="noopener noreferrer"
+
             onClick={(e) => e.stopPropagation()}
             className="mt-2 block animate-[fadeUp_0.7s_ease-out_both] text-center text-xs font-semibold text-violet-600 transition hover:text-blue-600"
             style={{ animationDelay: "800ms" }}
@@ -163,6 +163,13 @@ function Home() {
             </div>
           </div>
         )}
+
+        {phase === "ready" && !selected && (
+          <div onClick={(e) => e.stopPropagation()}>
+            <InstallApp />
+          </div>
+        )}
+
 
         <footer
           className={`mt-10 text-center text-xs text-slate-500 transition-opacity duration-700 ${
@@ -306,9 +313,171 @@ function GlobalAnim() {
         0% { background-position: -200% 0; }
         100% { background-position: 200% 0; }
       }
+      @keyframes floaty {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+      }
+      @keyframes sheen {
+        0% { transform: translateX(-120%) skewX(-20deg); }
+        100% { transform: translateX(220%) skewX(-20deg); }
+      }
+      @keyframes sparkle {
+        0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        50% { opacity: .5; transform: scale(1.25) rotate(18deg); }
+      }
+      @keyframes sheetUp {
+        from { opacity: 0; transform: translateY(40px) scale(.97); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
     `}</style>
   );
 }
+
+type BIPEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+};
+
+function InstallApp() {
+  const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState<"android" | "ios">("android");
+  const [deferred, setDeferred] = useState<BIPEvent | null>(null);
+  const [installed, setInstalled] = useState(false);
+
+  useEffect(() => {
+    const onBip = (e: Event) => {
+      e.preventDefault();
+      setDeferred(e as BIPEvent);
+    };
+    const onInstalled = () => {
+      setInstalled(true);
+      setOpen(false);
+    };
+    window.addEventListener("beforeinstallprompt", onBip);
+    window.addEventListener("appinstalled", onInstalled);
+    const standalone =
+      window.matchMedia?.("(display-mode: standalone)").matches ||
+      // iOS Safari
+      (window.navigator as unknown as { standalone?: boolean }).standalone === true;
+    if (standalone) setInstalled(true);
+    const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+    if (isIOS) setTab("ios");
+    return () => {
+      window.removeEventListener("beforeinstallprompt", onBip);
+      window.removeEventListener("appinstalled", onInstalled);
+    };
+  }, []);
+
+  if (installed) return null;
+
+  async function handleClick() {
+    if (deferred) {
+      await deferred.prompt();
+      const choice = await deferred.userChoice;
+      setDeferred(null);
+      if (choice.outcome === "accepted") return;
+    }
+    setOpen(true);
+  }
+
+  return (
+    <div
+      className="mt-10 animate-[fadeUp_0.7s_ease-out_both] text-center"
+      style={{ animationDelay: "1000ms" }}
+    >
+      <button
+        type="button"
+        onClick={handleClick}
+        className="group relative inline-flex animate-[floaty_3s_ease-in-out_infinite] items-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-violet-600 via-fuchsia-500 to-blue-600 px-6 py-3 text-sm font-black text-white shadow-lg shadow-violet-400/40 transition-transform duration-300 hover:scale-105 active:scale-95"
+      >
+        <span className="pointer-events-none absolute inset-y-0 left-0 w-1/3 animate-[sheen_2.4s_ease-in-out_infinite] bg-white/30 blur-md" />
+        <span className="relative">გადმოწერე ჩვენი აპი</span>
+        <span className="relative animate-[sparkle_1.6s_ease-in-out_infinite]">✨</span>
+      </button>
+
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-3 backdrop-blur-sm animate-[fadeIn_0.25s_ease-out_both] sm:items-center"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md animate-[sheetUp_0.4s_cubic-bezier(0.22,1,0.36,1)_both] rounded-3xl border border-violet-200 bg-white p-5 text-left shadow-2xl"
+          >
+            <div className="flex items-center gap-3">
+              <img
+                src="/pwa-icon-512.png"
+                alt="gadawere. აპის აიკონი"
+                width={48}
+                height={48}
+                loading="lazy"
+                className="h-12 w-12 rounded-xl shadow-md"
+              />
+              <div>
+                <p className="text-base font-black text-slate-900">გადმოწერე ჩვენი აპი ✨</p>
+                <p className="text-xs text-slate-500">დაამატე მთავარ ეკრანზე — მუშაობს iOS-სა და Android-ზე</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="ml-auto rounded-full px-2 py-1 text-lg text-slate-400 transition hover:text-slate-700"
+                aria-label="დახურვა"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-2 rounded-full bg-violet-50 p-1">
+              {(["android", "ios"] as const).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setTab(t)}
+                  className={`rounded-full px-3 py-2 text-sm font-bold transition-all duration-300 ${
+                    tab === t
+                      ? "bg-gradient-to-r from-violet-600 to-blue-600 text-white shadow"
+                      : "text-violet-700 hover:bg-white"
+                  }`}
+                >
+                  {t === "android" ? "🤖 Android" : "🍎 iPhone / iPad"}
+                </button>
+              ))}
+            </div>
+
+            <ol key={tab} className="mt-4 space-y-2">
+              {(tab === "android"
+                ? [
+                    "გახსენი საიტი Chrome-ში",
+                    "დააჭირე ⋮ მენიუს ზედა მარჯვენა კუთხეში",
+                    "აირჩიე „Install app“ ან „Add to Home screen“",
+                    "დაადასტურე — აპი გამოჩნდება მთავარ ეკრანზე 🎉",
+                  ]
+                : [
+                    "გახსენი საიტი Safari-ში",
+                    "დააჭირე გაზიარების ღილაკს ⬆️ ქვემოთ",
+                    "ჩამოსქროლე და აირჩიე „Add to Home Screen“",
+                    "დააჭირე „Add“ — აპი მზადაა 🎉",
+                  ]
+              ).map((step, i) => (
+                <li
+                  key={i}
+                  style={{ animationDelay: `${i * 90}ms` }}
+                  className="flex animate-[fadeUp_0.45s_ease-out_both] items-start gap-3 rounded-2xl border border-violet-100 bg-violet-50/50 p-3"
+                >
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-violet-600 to-blue-600 text-xs font-black text-white">
+                    {i + 1}
+                  </span>
+                  <span className="text-sm font-medium text-slate-700">{step}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 function SubjectPicker({ onPick }: { onPick: (s: Subject) => void }) {
   return (
