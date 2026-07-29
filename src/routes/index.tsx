@@ -164,6 +164,13 @@ function Home() {
           </div>
         )}
 
+        {phase === "ready" && !selected && (
+          <div onClick={(e) => e.stopPropagation()}>
+            <InstallApp />
+          </div>
+        )}
+
+
         <footer
           className={`mt-10 text-center text-xs text-slate-500 transition-opacity duration-700 ${
             phase === "ready" ? "opacity-100 delay-700" : "opacity-0"
