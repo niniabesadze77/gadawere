@@ -82,7 +82,7 @@ function Home() {
         </button>
         {phase === "ready" && !selected && (
           <a
-            href="https://mail.google.com/mail/?view=cm&fs=1&to=gadatseresupport@gmail.com"
+            href="mailto:gadatseresupport@gmail.com"
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
