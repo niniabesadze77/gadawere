@@ -1,0 +1,32 @@
+{
+  "name": "gadawere. – სასკოლო AI ასისტენტი",
+  "short_name": "gadawere.",
+  "description": "სასკოლო AI ასისტენტი ქართულ ენაზე – ქართული, მათემატიკა, ვარჯიშის ზონა.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#7c3aed",
+  "lang": "ka",
+  "icons": [
+    {
+      "src": "/pwa-icon-512.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
