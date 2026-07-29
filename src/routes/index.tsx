@@ -343,7 +343,10 @@ function SettingsMenu({
 }
 
 function BackgroundAnim({ effect }: { effect: Weather }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const seed = useMemo(() => Math.random(), [effect]);
+
 
   const particles = useMemo(() => {
     const count =
