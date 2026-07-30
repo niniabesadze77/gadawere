@@ -26,7 +26,16 @@ export const Route = createFileRoute("/api/improve-essay")({
           body: JSON.stringify({
             model: "openai/gpt-5.5",
             messages: [
-              ...(langEn ? [{ role: "system", content: EN_NOTE }] : []),
+              ...(langEn
+                ? [
+                    {
+                      role: "system",
+                      content:
+                        EN_NOTE +
+                        " You are an English writing editor. Use EXACTLY these markdown headings: \"### Corrected text\" and \"### Mistakes found\".",
+                    },
+                  ]
+                : []),
               {
                 role: "system",
                 content:
