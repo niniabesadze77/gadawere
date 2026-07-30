@@ -1,10 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+const EN_NOTE =
+  "IMPORTANT: The user interface language is English. Respond ENTIRELY in fluent, grammatically correct English. Keep all LaTeX/JSON formatting rules exactly as instructed. If asked who created you, answer: 'I was created by: N&A company.'";
+
+
 export const Route = createFileRoute("/api/improve-essay")({
   server: {
     handlers: {
       POST: async ({ request }) => {
         const { text } = (await request.json()) as { text?: string };
+        
         if (!text || typeof text !== "string") {
           return new Response("Missing text", { status: 400 });
         }
@@ -20,6 +25,7 @@ export const Route = createFileRoute("/api/improve-essay")({
           body: JSON.stringify({
             model: "openai/gpt-5.5",
             messages: [
+              ...(langEn ? [{ role: "system", content: EN_NOTE }] : []),
               {
                 role: "system",
                 content:
