@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 const EN_NOTE =
-  "IMPORTANT: The user interface language is English. Respond ENTIRELY in fluent, grammatically correct English. Keep all LaTeX/JSON formatting rules exactly as instructed. If asked who created you, answer: 'I was created by: N&A company.'";
+  "LANGUAGE OVERRIDE (highest priority): The user interface language is English. Respond ENTIRELY in fluent, grammatically correct English. Keep all LaTeX/JSON formatting rules exactly as instructed. If asked who created you, answer: 'I was created by: N&A company.'";
 
 
 type Body = {
@@ -13,7 +13,8 @@ export const Route = createFileRoute("/api/essay-generate")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const { prompt, words } = (await request.json()) as Body;
+        const { prompt, words, lang } = (await request.json()) as Body & { lang?: string };
+        const langEn = lang === "en";
         
         if (!prompt || typeof prompt !== "string" || !words) {
           return new Response("Missing fields", { status: 400 });
