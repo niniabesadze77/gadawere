@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+const EN_NOTE =
+  "LANGUAGE OVERRIDE (highest priority): The user interface language is English. Respond ENTIRELY in fluent, grammatically correct English. Keep all LaTeX/JSON formatting rules exactly as instructed. If asked who created you, answer: 'I was created by: N&A company.'";
+
+
 type Body = {
   subject: "math" | "georgian";
   grade: number;
@@ -10,7 +14,9 @@ export const Route = createFileRoute("/api/practice-generate")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const { subject, grade, level } = (await request.json()) as Body;
+        const { subject, grade, level, lang } = (await request.json()) as Body & { lang?: string };
+        const langEn = lang === "en";
+        
         if (!subject || !grade || !level) {
           return new Response("Missing fields", { status: 400 });
         }
@@ -37,6 +43,7 @@ export const Route = createFileRoute("/api/practice-generate")({
           body: JSON.stringify({
             model: "google/gemini-2.5-flash",
             messages: [
+              ...(langEn ? [{ role: "system", content: EN_NOTE }] : []),
               { role: "system", content: system },
               { role: "user", content: "დააგენერირე ტესტი JSON-ით." },
             ],

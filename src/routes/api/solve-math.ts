@@ -1,10 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+const EN_NOTE =
+  "LANGUAGE OVERRIDE (highest priority): The user interface language is English. Respond ENTIRELY in fluent, grammatically correct English. Keep all LaTeX/JSON formatting rules exactly as instructed. If asked who created you, answer: 'I was created by: N&A company.'";
+
+
 export const Route = createFileRoute("/api/solve-math")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const { imageDataUrl } = (await request.json()) as { imageDataUrl?: string };
+        const { imageDataUrl, lang } = (await request.json()) as { imageDataUrl?: string } & { lang?: string };
+        const langEn = lang === "en";
+        
         if (!imageDataUrl || !imageDataUrl.startsWith("data:image/")) {
           return new Response("Missing imageDataUrl", { status: 400 });
         }
@@ -20,6 +26,7 @@ export const Route = createFileRoute("/api/solve-math")({
           body: JSON.stringify({
             model: "openai/gpt-5.5",
             messages: [
+              ...(langEn ? [{ role: "system", content: EN_NOTE }] : []),
               {
                 role: "system",
                 content:

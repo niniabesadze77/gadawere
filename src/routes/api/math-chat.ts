@@ -1,12 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+const EN_NOTE =
+  "LANGUAGE OVERRIDE (highest priority): The user interface language is English. Respond ENTIRELY in fluent, grammatically correct English. Keep all LaTeX/JSON formatting rules exactly as instructed. If asked who created you, answer: 'I was created by: N&A company.'";
+
+
 type Msg = { role: "user" | "assistant"; content: string };
 
 export const Route = createFileRoute("/api/math-chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const { messages } = (await request.json()) as { messages?: Msg[] };
+        const { messages, lang } = (await request.json()) as { messages?: Msg[] } & { lang?: string };
+        const langEn = lang === "en";
+        
         if (!messages || !Array.isArray(messages)) {
           return new Response("Missing messages", { status: 400 });
         }
@@ -22,6 +28,7 @@ export const Route = createFileRoute("/api/math-chat")({
           body: JSON.stringify({
             model: "openai/gpt-5.5",
             messages: [
+              ...(langEn ? [{ role: "system", content: EN_NOTE }] : []),
               {
                 role: "system",
                 content:

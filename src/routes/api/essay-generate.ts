@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+const EN_NOTE =
+  "LANGUAGE OVERRIDE (highest priority): The user interface language is English. Respond ENTIRELY in fluent, grammatically correct English. Keep all LaTeX/JSON formatting rules exactly as instructed. If asked who created you, answer: 'I was created by: N&A company.'";
+
+
 type Body = {
   prompt: string;
   words: number;
@@ -9,7 +13,9 @@ export const Route = createFileRoute("/api/essay-generate")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const { prompt, words } = (await request.json()) as Body;
+        const { prompt, words, lang } = (await request.json()) as Body & { lang?: string };
+        const langEn = lang === "en";
+        
         if (!prompt || typeof prompt !== "string" || !words) {
           return new Response("Missing fields", { status: 400 });
         }
@@ -32,6 +38,7 @@ export const Route = createFileRoute("/api/essay-generate")({
           body: JSON.stringify({
             model: "google/gemini-2.5-pro",
             messages: [
+              ...(langEn ? [{ role: "system", content: EN_NOTE }] : []),
               { role: "system", content: system },
               { role: "user", content: prompt },
             ],
