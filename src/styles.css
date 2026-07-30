@@ -337,3 +337,43 @@ body button[data-on="true"]:not([data-plain]):hover {
   border-color: rgba(255, 255, 255, 0.3);
   color: #fff;
 }
+
+/* ---------------- Surfaces & states ---------------- */
+
+.gw-card {
+  background: linear-gradient(150deg, rgba(255,255,255,0.78), rgba(255,255,255,0.5));
+  border: 1px solid rgba(255,255,255,0.65);
+  box-shadow: 0 12px 30px -18px rgba(76,29,149,0.35);
+  color: #24124d;
+}
+.dark .gw-card {
+  background: linear-gradient(150deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+  border-color: rgba(255,255,255,0.14);
+  color: #eceaff;
+}
+
+.gw-note { border-radius: 1rem; padding: 0.75rem 0.9rem; border: 1px solid; }
+.gw-note-ok { background: rgba(16,185,129,0.12); border-color: rgba(16,185,129,0.4); color: #065f46; }
+.gw-note-bad { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.4); color: #991b1b; }
+.gw-note-warn { background: rgba(245,158,11,0.14); border-color: rgba(245,158,11,0.45); color: #92400e; }
+.dark .gw-note-ok { color: #6ee7b7; }
+.dark .gw-note-bad { color: #fca5a5; }
+.dark .gw-note-warn { color: #fcd34d; }
+
+body button.gw-answer[data-state="correct"] {
+  background: linear-gradient(135deg, rgba(16,185,129,0.5), rgba(5,150,105,0.4));
+  color: #fff;
+}
+body button.gw-answer[data-state="wrong"] {
+  background: linear-gradient(135deg, rgba(239,68,68,0.5), rgba(190,18,60,0.4));
+  color: #fff;
+}
+body button.gw-answer[data-state="reveal"] {
+  background: linear-gradient(135deg, rgba(16,185,129,0.28), rgba(5,150,105,0.2));
+}
+
+/* Dark-mode readability */
+.dark .gw-root .prose,
+.dark .gw-root .prose * { color: #eceaff; }
+.dark .gw-root .katex { color: #eceaff; }
+.dark .gw-root [class*="text-slate-6"] { color: #b9bce0; }
