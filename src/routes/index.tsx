@@ -1070,7 +1070,7 @@ function EssayWriter() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt, words, lang }),
       });
-      if (!res.ok) throw new Error((await res.text()) || `${t.errorGeneric} (${res.status})`);
+      if (!res.ok) throw new Error(await friendlyApiError(res, t));
       const data = (await res.json()) as { essay: string };
       setProgress(100);
       await new Promise((r) => setTimeout(r, 350));
@@ -1187,7 +1187,7 @@ function GeorgianChecker() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, lang }),
       });
-      if (!res.ok) throw new Error((await res.text()) || `${t.errorGeneric} (${res.status})`);
+      if (!res.ok) throw new Error(await friendlyApiError(res, t));
       const data = (await res.json()) as { improved: string };
       setResult(data.improved);
     } catch (e) {
@@ -1374,7 +1374,7 @@ function MathChat() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: next, lang }),
       });
-      if (!res.ok) throw new Error((await res.text()) || `${t.errorGeneric} (${res.status})`);
+      if (!res.ok) throw new Error(await friendlyApiError(res, t));
       const data = (await res.json()) as { reply: string };
       const after: Msg[] = [...next, { role: "assistant", content: data.reply }];
       setMessages(after);
@@ -1584,7 +1584,7 @@ function MathPhoto() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ imageDataUrl: preview, lang }),
       });
-      if (!res.ok) throw new Error((await res.text()) || `${t.errorGeneric} (${res.status})`);
+      if (!res.ok) throw new Error(await friendlyApiError(res, t));
       const data = (await res.json()) as { solution: string };
       setSolution(data.solution);
     } catch (e) {
@@ -1731,7 +1731,7 @@ function PracticeZone({ subject }: { subject: "math" | "georgian" }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subject, grade, level, lang }),
       });
-      if (!res.ok) throw new Error((await res.text()) || `${t.errorGeneric} (${res.status})`);
+      if (!res.ok) throw new Error(await friendlyApiError(res, t));
       const data = (await res.json()) as { questions: (MathQ | GeoQ)[] };
       const qs = (data.questions || []).slice(0, 10);
       if (qs.length === 0) throw new Error(t.genFail);
@@ -2111,6 +2111,18 @@ function Card({
   className?: string;
 }) {
   return <div className={`gw-card rounded-3xl p-4 ${className}`}>{children}</div>;
+}
+
+async function friendlyApiError(res: Response, t: { errorGeneric: string; errorBusy: string; errorLimit: string }) {
+  let raw = "";
+  try {
+    raw = await res.text();
+  } catch {
+    raw = "";
+  }
+  if (res.status === 429) return t.errorBusy;
+  if (res.status === 402 || /not enough credits|payment_required|limit/i.test(raw)) return t.errorLimit;
+  return t.errorGeneric;
 }
 
 function ErrorNote({ text }: { text: string }) {
