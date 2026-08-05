@@ -135,16 +135,14 @@ function Home() {
 
   return (
     <LangCtx.Provider value={{ lang, t }}>
-      <div
-        onClick={advance}
-        className="gw-root relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-violet-50 to-blue-50 text-slate-900"
-      >
+      <div className="gw-root relative min-h-screen overflow-hidden text-slate-900">
         {/* Background layers — always behind everything */}
         <BackgroundAnim effect={weather} dim={!!selected} />
         {selected && <SubjectGlyphs subject={selected} lang={lang} />}
 
         <div className="pointer-events-none fixed -left-24 top-0 -z-10 h-72 w-72 rounded-full bg-violet-300/40 blur-3xl" />
         <div className="pointer-events-none fixed -right-24 top-40 -z-10 h-72 w-72 rounded-full bg-blue-300/40 blur-3xl" />
+
 
         {showMain && (
           <SettingsMenu
@@ -182,7 +180,7 @@ function Home() {
         <div
           className={`fixed left-1/2 z-30 -translate-x-1/2 transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
             phase === "intro"
-              ? "top-1/2 -translate-y-1/2 scale-150"
+              ? "top-1/2 -translate-y-1/2 scale-125"
               : "top-6 scale-100"
           }`}
         >
@@ -190,11 +188,25 @@ function Home() {
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              if (showMain) setSelected(null);
+              if (phase === "intro") advance();
+              else if (showMain) setSelected(null);
             }}
             data-plain
-            className="relative block cursor-pointer rounded-full bg-transparent px-5 py-2"
+            className={`relative block cursor-pointer px-5 py-2 transition-all duration-700 ${
+              phase === "intro"
+                ? "gw-glass animate-[floaty_5s_ease-in-out_infinite] rounded-full px-10 py-8 shadow-[0_20px_60px_-20px_rgba(109,40,217,0.55)]"
+                : "rounded-full bg-transparent"
+            }`}
           >
+            {phase === "intro" && (
+              <>
+                <span className="pointer-events-none absolute inset-0 animate-[ripple_3s_ease-out_infinite] rounded-full border border-violet-400/50" />
+                <span
+                  className="pointer-events-none absolute inset-0 animate-[ripple_3s_ease-out_infinite] rounded-full border border-blue-400/40"
+                  style={{ animationDelay: "1.5s" }}
+                />
+              </>
+            )}
             <div className="absolute inset-0 -z-10 animate-[glowPulse_5s_ease-in-out_infinite] rounded-full bg-gradient-to-r from-violet-400 to-blue-400 opacity-40 blur-2xl" />
             <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-2xl font-black tracking-tight text-transparent">
               {t.brand}
@@ -202,20 +214,24 @@ function Home() {
           </button>
         </div>
 
-        {/* Intro hint */}
+        {/* Intro hint + tap-anywhere layer */}
         {phase === "intro" && (
-          <div className="fixed inset-x-0 bottom-16 z-20 text-center">
-            <p className="animate-[breathe_2.6s_ease-in-out_infinite] text-sm font-semibold text-violet-600">
-              {t.tapToStart}
-            </p>
-          </div>
+          <>
+            <div
+              onClick={advance}
+              className="fixed inset-0 z-10"
+              aria-hidden="true"
+            />
+            <div className="fixed inset-x-0 bottom-16 z-20 text-center">
+              <p className="animate-[breathe_2.6s_ease-in-out_infinite] text-sm font-semibold text-violet-600">
+                {t.tapToStart}
+              </p>
+            </div>
+          </>
         )}
 
-        {phase === "auth" && (
-          <div onClick={(e) => e.stopPropagation()}>
-            <RegisterScreen onDone={onRegistered} />
-          </div>
-        )}
+        {phase === "auth" && <RegisterScreen onDone={onRegistered} />}
+
 
         {phase === "signing" && <SigningLoader />}
 
@@ -346,54 +362,80 @@ function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
   }
 
   const field =
-    "w-full rounded-2xl border border-white/60 bg-white/70 px-4 py-3 text-sm font-medium outline-none transition focus:border-violet-400";
+    "peer w-full rounded-2xl border border-white/70 bg-white/60 px-4 pb-2.5 pt-6 text-sm font-semibold outline-none backdrop-blur-md transition-all duration-300 focus:border-violet-400 focus:bg-white/85 focus:shadow-[0_10px_30px_-12px_rgba(109,40,217,0.45)]";
+
+  const fields = [
+    { v: name, set: setName, ph: t.name, type: "text", icon: "👤", d: 0 },
+    { v: surname, set: setSurname, ph: t.surname, type: "text", icon: "🪪", d: 90 },
+    { v: phone, set: setPhone, ph: t.phone, type: "tel", icon: "📱", d: 180 },
+    { v: pass, set: setPass, ph: t.password, type: "password", icon: "🔒", d: 270 },
+  ];
 
   return (
     <div className="relative z-20 mx-auto flex min-h-screen max-w-md items-center px-4 pb-10 pt-28">
-      <div className="gw-panel w-full animate-[sheetUp_0.7s_cubic-bezier(0.16,1,0.3,1)_both] rounded-[2rem] p-6">
-        <h2 className="text-center text-2xl font-black">
-          <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent">
-            {t.registerTitle}
-          </span>
-        </h2>
-        <p className="mt-1 text-center text-xs opacity-70">{t.registerSub}</p>
+      <div className="relative w-full animate-[sheetUp_0.8s_cubic-bezier(0.16,1,0.3,1)_both]">
+        {/* soft aura behind the card */}
+        <div className="pointer-events-none absolute -inset-6 -z-10 rounded-[3rem] bg-[conic-gradient(from_0deg,rgba(167,139,250,0.35),rgba(96,165,250,0.35),rgba(244,182,255,0.35),rgba(167,139,250,0.35))] blur-3xl animate-[auraSpin_18s_linear_infinite]" />
 
-        <div className="mt-6 space-y-3">
-          {[
-            { v: name, set: setName, ph: t.name, type: "text", d: 0 },
-            { v: surname, set: setSurname, ph: t.surname, type: "text", d: 80 },
-            { v: phone, set: setPhone, ph: t.phone, type: "tel", d: 160 },
-            { v: pass, set: setPass, ph: t.password, type: "password", d: 240 },
-          ].map((f, i) => (
-            <input
-              key={i}
-              type={f.type}
-              value={f.v}
-              onChange={(e) => f.set(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && submit()}
-              placeholder={f.ph}
-              style={{ animationDelay: `${f.d}ms` }}
-              className={`${field} animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_both]`}
-            />
-          ))}
+        <div className="gw-panel relative overflow-hidden rounded-[2.25rem] p-7">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-violet-400/25 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-20 -left-14 h-44 w-44 rounded-full bg-blue-400/25 blur-3xl" />
+
+          <div className="relative flex flex-col items-center">
+            <div className="animate-[floaty_5s_ease-in-out_infinite] rounded-3xl bg-gradient-to-br from-violet-500 to-blue-500 px-4 py-3 text-2xl shadow-[0_16px_40px_-16px_rgba(79,70,229,0.8)]">
+              ✨
+            </div>
+            <h2 className="mt-4 text-center text-[1.7rem] font-black leading-tight">
+              <span className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-blue-600 bg-clip-text text-transparent">
+                {t.registerTitle}
+              </span>
+            </h2>
+            <p className="mt-1.5 text-center text-xs font-medium opacity-70">
+              {t.registerSub}
+            </p>
+            <div className="mt-4 h-px w-24 bg-gradient-to-r from-transparent via-violet-400/70 to-transparent" />
+          </div>
+
+          <div className="relative mt-6 space-y-3.5">
+            {fields.map((f, i) => (
+              <div
+                key={i}
+                className="relative animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_both]"
+                style={{ animationDelay: `${f.d}ms` }}
+              >
+                <input
+                  type={f.type}
+                  value={f.v}
+                  onChange={(e) => f.set(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && submit()}
+                  placeholder=" "
+                  className={field}
+                />
+                <span className="pointer-events-none absolute left-4 top-2 text-[10px] font-bold uppercase tracking-wide text-violet-500/80">
+                  {f.icon} {f.ph}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {error && (
+            <p className="mt-4 animate-[pop_0.35s_ease-out_both] rounded-xl border border-red-300/60 bg-red-500/10 p-2.5 text-center text-xs font-semibold text-red-600">
+              {error}
+            </p>
+          )}
+
+          <button
+            type="button"
+            onClick={submit}
+            data-on="true"
+            className="mt-6 w-full rounded-2xl px-4 py-3.5 text-sm font-black tracking-wide transition-transform duration-300 hover:-translate-y-0.5"
+          >
+            {t.createAccount} ✨
+          </button>
         </div>
-
-        {error && (
-          <p className="mt-3 rounded-xl border border-red-300/60 bg-red-500/10 p-2.5 text-center text-xs font-semibold text-red-600">
-            {error}
-          </p>
-        )}
-
-        <button
-          type="button"
-          onClick={submit}
-          data-on="true"
-          className="mt-5 w-full rounded-2xl px-4 py-3 text-sm font-black"
-        >
-          {t.createAccount} ✨
-        </button>
       </div>
     </div>
+
   );
 }
 
@@ -681,7 +723,7 @@ function BackgroundAnim({ effect, dim }: { effect: Weather; dim: boolean }) {
                 : undefined,
             fontSize:
               effect === "snow" || effect === "cherry" ? `${p.size}px` : undefined,
-            color: effect === "snow" ? "rgba(148,163,255,0.8)" : undefined,
+            color: effect === "snow" ? "rgba(109,126,232,0.95)" : undefined,
             background:
               effect === "bubbles"
                 ? "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95), rgba(186,230,253,0.45) 42%, rgba(129,180,255,0.18) 72%, rgba(255,255,255,0.05) 100%)"
@@ -806,6 +848,9 @@ function GlobalAnim() {
       @keyframes sheetUp { from { opacity: 0; transform: translate3d(0,44px,0) scale(.97); } to { opacity: 1; transform: translate3d(0,0,0) scale(1); } }
       @keyframes loadSlide { 0% { transform: translateX(-110%);} 100% { transform: translateX(320%);} }
       @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes ripple { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(1.55); opacity: 0; } }
+      @keyframes auraSpin { to { transform: rotate(360deg); } }
+
     `}</style>
   );
 }
@@ -1065,7 +1110,7 @@ function EssayWriter() {
       250,
     );
     try {
-      const res = await fetch("/api/essay-generate", {
+      const res = await fetch("/api/public/essay-generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt, words, lang }),
@@ -1182,7 +1227,7 @@ function GeorgianChecker() {
     setError(null);
     setResult("");
     try {
-      const res = await fetch("/api/improve-essay", {
+      const res = await fetch("/api/public/improve-essay", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, lang }),
@@ -1369,7 +1414,7 @@ function MathChat() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/math-chat", {
+      const res = await fetch("/api/public/math-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: next, lang }),
@@ -1579,7 +1624,7 @@ function MathPhoto() {
     setError(null);
     setSolution("");
     try {
-      const res = await fetch("/api/solve-math", {
+      const res = await fetch("/api/public/solve-math", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ imageDataUrl: preview, lang }),
@@ -1726,7 +1771,7 @@ function PracticeZone({ subject }: { subject: "math" | "georgian" }) {
       200,
     );
     try {
-      const res = await fetch("/api/practice-generate", {
+      const res = await fetch("/api/public/practice-generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subject, grade, level, lang }),

@@ -9,7 +9,7 @@ type Body = {
   words: number;
 };
 
-export const Route = createFileRoute("/api/essay-generate")({
+export const Route = createFileRoute("/api/public/essay-generate")({
   server: {
     handlers: {
       POST: async ({ request }) => {

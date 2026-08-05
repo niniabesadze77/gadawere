@@ -240,12 +240,25 @@ body button[data-on="true"]:not([data-plain]):hover {
   );
 }
 
+/* ---------------- Page backdrop (must live on body so the weather
+   layers, which sit at -z-10, stay visible above it) ---------------- */
+
+body {
+  background: linear-gradient(140deg, #ffffff 0%, #f5f3ff 55%, #eff6ff 100%);
+  background-attachment: fixed;
+}
+
 /* ---------------- Dark mode ---------------- */
 
-.dark .gw-root {
+.dark body {
   background: linear-gradient(140deg, #0b0d1c 0%, #16112e 50%, #0c1428 100%);
+  background-attachment: fixed;
+}
+
+.dark .gw-root {
   color: #e8e9f7;
 }
+
 
 .dark .gw-root [class*="text-slate-9"],
 .dark .gw-root [class*="text-slate-8"],

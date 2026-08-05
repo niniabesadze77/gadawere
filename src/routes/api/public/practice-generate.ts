@@ -10,7 +10,7 @@ type Body = {
   level: number;
 };
 
-export const Route = createFileRoute("/api/practice-generate")({
+export const Route = createFileRoute("/api/public/practice-generate")({
   server: {
     handlers: {
       POST: async ({ request }) => {

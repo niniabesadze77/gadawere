@@ -10,102 +10,103 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiSolveMathRouteImport } from './routes/api/solve-math'
-import { Route as ApiPracticeGenerateRouteImport } from './routes/api/practice-generate'
-import { Route as ApiMathChatRouteImport } from './routes/api/math-chat'
-import { Route as ApiImproveEssayRouteImport } from './routes/api/improve-essay'
-import { Route as ApiEssayGenerateRouteImport } from './routes/api/essay-generate'
+import { Route as ApiPublicSolveMathRouteImport } from './routes/api/public/solve-math'
+import { Route as ApiPublicPracticeGenerateRouteImport } from './routes/api/public/practice-generate'
+import { Route as ApiPublicMathChatRouteImport } from './routes/api/public/math-chat'
+import { Route as ApiPublicImproveEssayRouteImport } from './routes/api/public/improve-essay'
+import { Route as ApiPublicEssayGenerateRouteImport } from './routes/api/public/essay-generate'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiSolveMathRoute = ApiSolveMathRouteImport.update({
-  id: '/api/solve-math',
-  path: '/api/solve-math',
+const ApiPublicSolveMathRoute = ApiPublicSolveMathRouteImport.update({
+  id: '/api/public/solve-math',
+  path: '/api/public/solve-math',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPracticeGenerateRoute = ApiPracticeGenerateRouteImport.update({
-  id: '/api/practice-generate',
-  path: '/api/practice-generate',
+const ApiPublicPracticeGenerateRoute =
+  ApiPublicPracticeGenerateRouteImport.update({
+    id: '/api/public/practice-generate',
+    path: '/api/public/practice-generate',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicMathChatRoute = ApiPublicMathChatRouteImport.update({
+  id: '/api/public/math-chat',
+  path: '/api/public/math-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiMathChatRoute = ApiMathChatRouteImport.update({
-  id: '/api/math-chat',
-  path: '/api/math-chat',
+const ApiPublicImproveEssayRoute = ApiPublicImproveEssayRouteImport.update({
+  id: '/api/public/improve-essay',
+  path: '/api/public/improve-essay',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiImproveEssayRoute = ApiImproveEssayRouteImport.update({
-  id: '/api/improve-essay',
-  path: '/api/improve-essay',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiEssayGenerateRoute = ApiEssayGenerateRouteImport.update({
-  id: '/api/essay-generate',
-  path: '/api/essay-generate',
+const ApiPublicEssayGenerateRoute = ApiPublicEssayGenerateRouteImport.update({
+  id: '/api/public/essay-generate',
+  path: '/api/public/essay-generate',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/api/essay-generate': typeof ApiEssayGenerateRoute
-  '/api/improve-essay': typeof ApiImproveEssayRoute
-  '/api/math-chat': typeof ApiMathChatRoute
-  '/api/practice-generate': typeof ApiPracticeGenerateRoute
-  '/api/solve-math': typeof ApiSolveMathRoute
+  '/api/public/essay-generate': typeof ApiPublicEssayGenerateRoute
+  '/api/public/improve-essay': typeof ApiPublicImproveEssayRoute
+  '/api/public/math-chat': typeof ApiPublicMathChatRoute
+  '/api/public/practice-generate': typeof ApiPublicPracticeGenerateRoute
+  '/api/public/solve-math': typeof ApiPublicSolveMathRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/api/essay-generate': typeof ApiEssayGenerateRoute
-  '/api/improve-essay': typeof ApiImproveEssayRoute
-  '/api/math-chat': typeof ApiMathChatRoute
-  '/api/practice-generate': typeof ApiPracticeGenerateRoute
-  '/api/solve-math': typeof ApiSolveMathRoute
+  '/api/public/essay-generate': typeof ApiPublicEssayGenerateRoute
+  '/api/public/improve-essay': typeof ApiPublicImproveEssayRoute
+  '/api/public/math-chat': typeof ApiPublicMathChatRoute
+  '/api/public/practice-generate': typeof ApiPublicPracticeGenerateRoute
+  '/api/public/solve-math': typeof ApiPublicSolveMathRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/api/essay-generate': typeof ApiEssayGenerateRoute
-  '/api/improve-essay': typeof ApiImproveEssayRoute
-  '/api/math-chat': typeof ApiMathChatRoute
-  '/api/practice-generate': typeof ApiPracticeGenerateRoute
-  '/api/solve-math': typeof ApiSolveMathRoute
+  '/api/public/essay-generate': typeof ApiPublicEssayGenerateRoute
+  '/api/public/improve-essay': typeof ApiPublicImproveEssayRoute
+  '/api/public/math-chat': typeof ApiPublicMathChatRoute
+  '/api/public/practice-generate': typeof ApiPublicPracticeGenerateRoute
+  '/api/public/solve-math': typeof ApiPublicSolveMathRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/api/essay-generate'
-    | '/api/improve-essay'
-    | '/api/math-chat'
-    | '/api/practice-generate'
-    | '/api/solve-math'
+    | '/api/public/essay-generate'
+    | '/api/public/improve-essay'
+    | '/api/public/math-chat'
+    | '/api/public/practice-generate'
+    | '/api/public/solve-math'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/api/essay-generate'
-    | '/api/improve-essay'
-    | '/api/math-chat'
-    | '/api/practice-generate'
-    | '/api/solve-math'
+    | '/api/public/essay-generate'
+    | '/api/public/improve-essay'
+    | '/api/public/math-chat'
+    | '/api/public/practice-generate'
+    | '/api/public/solve-math'
   id:
     | '__root__'
     | '/'
-    | '/api/essay-generate'
-    | '/api/improve-essay'
-    | '/api/math-chat'
-    | '/api/practice-generate'
-    | '/api/solve-math'
+    | '/api/public/essay-generate'
+    | '/api/public/improve-essay'
+    | '/api/public/math-chat'
+    | '/api/public/practice-generate'
+    | '/api/public/solve-math'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ApiEssayGenerateRoute: typeof ApiEssayGenerateRoute
-  ApiImproveEssayRoute: typeof ApiImproveEssayRoute
-  ApiMathChatRoute: typeof ApiMathChatRoute
-  ApiPracticeGenerateRoute: typeof ApiPracticeGenerateRoute
-  ApiSolveMathRoute: typeof ApiSolveMathRoute
+  ApiPublicEssayGenerateRoute: typeof ApiPublicEssayGenerateRoute
+  ApiPublicImproveEssayRoute: typeof ApiPublicImproveEssayRoute
+  ApiPublicMathChatRoute: typeof ApiPublicMathChatRoute
+  ApiPublicPracticeGenerateRoute: typeof ApiPublicPracticeGenerateRoute
+  ApiPublicSolveMathRoute: typeof ApiPublicSolveMathRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -117,39 +118,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/solve-math': {
-      id: '/api/solve-math'
-      path: '/api/solve-math'
-      fullPath: '/api/solve-math'
-      preLoaderRoute: typeof ApiSolveMathRouteImport
+    '/api/public/solve-math': {
+      id: '/api/public/solve-math'
+      path: '/api/public/solve-math'
+      fullPath: '/api/public/solve-math'
+      preLoaderRoute: typeof ApiPublicSolveMathRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/practice-generate': {
-      id: '/api/practice-generate'
-      path: '/api/practice-generate'
-      fullPath: '/api/practice-generate'
-      preLoaderRoute: typeof ApiPracticeGenerateRouteImport
+    '/api/public/practice-generate': {
+      id: '/api/public/practice-generate'
+      path: '/api/public/practice-generate'
+      fullPath: '/api/public/practice-generate'
+      preLoaderRoute: typeof ApiPublicPracticeGenerateRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/math-chat': {
-      id: '/api/math-chat'
-      path: '/api/math-chat'
-      fullPath: '/api/math-chat'
-      preLoaderRoute: typeof ApiMathChatRouteImport
+    '/api/public/math-chat': {
+      id: '/api/public/math-chat'
+      path: '/api/public/math-chat'
+      fullPath: '/api/public/math-chat'
+      preLoaderRoute: typeof ApiPublicMathChatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/improve-essay': {
-      id: '/api/improve-essay'
-      path: '/api/improve-essay'
-      fullPath: '/api/improve-essay'
-      preLoaderRoute: typeof ApiImproveEssayRouteImport
+    '/api/public/improve-essay': {
+      id: '/api/public/improve-essay'
+      path: '/api/public/improve-essay'
+      fullPath: '/api/public/improve-essay'
+      preLoaderRoute: typeof ApiPublicImproveEssayRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/essay-generate': {
-      id: '/api/essay-generate'
-      path: '/api/essay-generate'
-      fullPath: '/api/essay-generate'
-      preLoaderRoute: typeof ApiEssayGenerateRouteImport
+    '/api/public/essay-generate': {
+      id: '/api/public/essay-generate'
+      path: '/api/public/essay-generate'
+      fullPath: '/api/public/essay-generate'
+      preLoaderRoute: typeof ApiPublicEssayGenerateRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -157,11 +158,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ApiEssayGenerateRoute: ApiEssayGenerateRoute,
-  ApiImproveEssayRoute: ApiImproveEssayRoute,
-  ApiMathChatRoute: ApiMathChatRoute,
-  ApiPracticeGenerateRoute: ApiPracticeGenerateRoute,
-  ApiSolveMathRoute: ApiSolveMathRoute,
+  ApiPublicEssayGenerateRoute: ApiPublicEssayGenerateRoute,
+  ApiPublicImproveEssayRoute: ApiPublicImproveEssayRoute,
+  ApiPublicMathChatRoute: ApiPublicMathChatRoute,
+  ApiPublicPracticeGenerateRoute: ApiPublicPracticeGenerateRoute,
+  ApiPublicSolveMathRoute: ApiPublicSolveMathRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
