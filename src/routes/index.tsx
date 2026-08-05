@@ -819,6 +819,9 @@ function GlobalAnim() {
       @keyframes sheetUp { from { opacity: 0; transform: translate3d(0,44px,0) scale(.97); } to { opacity: 1; transform: translate3d(0,0,0) scale(1); } }
       @keyframes loadSlide { 0% { transform: translateX(-110%);} 100% { transform: translateX(320%);} }
       @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes ripple { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(1.55); opacity: 0; } }
+      @keyframes auraSpin { to { transform: rotate(360deg); } }
+
     `}</style>
   );
 }
