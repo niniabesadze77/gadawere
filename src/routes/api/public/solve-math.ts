@@ -4,7 +4,7 @@ const EN_NOTE =
   "LANGUAGE OVERRIDE (highest priority): The user interface language is English. Respond ENTIRELY in fluent, grammatically correct English. Keep all LaTeX/JSON formatting rules exactly as instructed. If asked who created you, answer: 'I was created by: N&A company.'";
 
 
-export const Route = createFileRoute("/api/solve-math")({
+export const Route = createFileRoute("/api/public/solve-math")({
   server: {
     handlers: {
       POST: async ({ request }) => {

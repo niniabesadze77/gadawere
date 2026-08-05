@@ -6,7 +6,7 @@ const EN_NOTE =
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-export const Route = createFileRoute("/api/math-chat")({
+export const Route = createFileRoute("/api/public/math-chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {

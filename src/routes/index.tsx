@@ -1065,7 +1065,7 @@ function EssayWriter() {
       250,
     );
     try {
-      const res = await fetch("/api/essay-generate", {
+      const res = await fetch("/api/public/essay-generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt, words, lang }),
@@ -1182,7 +1182,7 @@ function GeorgianChecker() {
     setError(null);
     setResult("");
     try {
-      const res = await fetch("/api/improve-essay", {
+      const res = await fetch("/api/public/improve-essay", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, lang }),
@@ -1369,7 +1369,7 @@ function MathChat() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/math-chat", {
+      const res = await fetch("/api/public/math-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: next, lang }),
@@ -1579,7 +1579,7 @@ function MathPhoto() {
     setError(null);
     setSolution("");
     try {
-      const res = await fetch("/api/solve-math", {
+      const res = await fetch("/api/public/solve-math", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ imageDataUrl: preview, lang }),
@@ -1726,7 +1726,7 @@ function PracticeZone({ subject }: { subject: "math" | "georgian" }) {
       200,
     );
     try {
-      const res = await fetch("/api/practice-generate", {
+      const res = await fetch("/api/public/practice-generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subject, grade, level, lang }),
