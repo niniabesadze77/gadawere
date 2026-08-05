@@ -135,16 +135,14 @@ function Home() {
 
   return (
     <LangCtx.Provider value={{ lang, t }}>
-      <div
-        onClick={advance}
-        className="gw-root relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-violet-50 to-blue-50 text-slate-900"
-      >
+      <div className="gw-root relative min-h-screen overflow-hidden text-slate-900">
         {/* Background layers — always behind everything */}
         <BackgroundAnim effect={weather} dim={!!selected} />
         {selected && <SubjectGlyphs subject={selected} lang={lang} />}
 
         <div className="pointer-events-none fixed -left-24 top-0 -z-10 h-72 w-72 rounded-full bg-violet-300/40 blur-3xl" />
         <div className="pointer-events-none fixed -right-24 top-40 -z-10 h-72 w-72 rounded-full bg-blue-300/40 blur-3xl" />
+
 
         {showMain && (
           <SettingsMenu
