@@ -214,21 +214,24 @@ function Home() {
           </button>
         </div>
 
-        {/* Intro hint */}
+        {/* Intro hint + tap-anywhere layer */}
         {phase === "intro" && (
-          <div className="fixed inset-x-0 bottom-16 z-20 text-center">
-            <p className="animate-[breathe_2.6s_ease-in-out_infinite] text-sm font-semibold text-violet-600">
-              {t.tapToStart}
-            </p>
-          </div>
+          <>
+            <div
+              onClick={advance}
+              className="fixed inset-0 z-10"
+              aria-hidden="true"
+            />
+            <div className="fixed inset-x-0 bottom-16 z-20 text-center">
+              <p className="animate-[breathe_2.6s_ease-in-out_infinite] text-sm font-semibold text-violet-600">
+                {t.tapToStart}
+              </p>
+            </div>
+          </>
         )}
 
+        {phase === "auth" && <RegisterScreen onDone={onRegistered} />}
 
-        {phase === "auth" && (
-          <div onClick={(e) => e.stopPropagation()}>
-            <RegisterScreen onDone={onRegistered} />
-          </div>
-        )}
 
         {phase === "signing" && <SigningLoader />}
 
