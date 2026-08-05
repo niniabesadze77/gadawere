@@ -180,7 +180,7 @@ function Home() {
         <div
           className={`fixed left-1/2 z-30 -translate-x-1/2 transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
             phase === "intro"
-              ? "top-1/2 -translate-y-1/2 scale-150"
+              ? "top-1/2 -translate-y-1/2 scale-125"
               : "top-6 scale-100"
           }`}
         >
@@ -188,11 +188,25 @@ function Home() {
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              if (showMain) setSelected(null);
+              if (phase === "intro") advance();
+              else if (showMain) setSelected(null);
             }}
             data-plain
-            className="relative block cursor-pointer rounded-full bg-transparent px-5 py-2"
+            className={`relative block cursor-pointer px-5 py-2 transition-all duration-700 ${
+              phase === "intro"
+                ? "gw-glass animate-[floaty_5s_ease-in-out_infinite] rounded-full px-10 py-8 shadow-[0_20px_60px_-20px_rgba(109,40,217,0.55)]"
+                : "rounded-full bg-transparent"
+            }`}
           >
+            {phase === "intro" && (
+              <>
+                <span className="pointer-events-none absolute inset-0 animate-[ripple_3s_ease-out_infinite] rounded-full border border-violet-400/50" />
+                <span
+                  className="pointer-events-none absolute inset-0 animate-[ripple_3s_ease-out_infinite] rounded-full border border-blue-400/40"
+                  style={{ animationDelay: "1.5s" }}
+                />
+              </>
+            )}
             <div className="absolute inset-0 -z-10 animate-[glowPulse_5s_ease-in-out_infinite] rounded-full bg-gradient-to-r from-violet-400 to-blue-400 opacity-40 blur-2xl" />
             <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-2xl font-black tracking-tight text-transparent">
               {t.brand}
@@ -208,6 +222,7 @@ function Home() {
             </p>
           </div>
         )}
+
 
         {phase === "auth" && (
           <div onClick={(e) => e.stopPropagation()}>
