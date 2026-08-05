@@ -362,54 +362,80 @@ function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
   }
 
   const field =
-    "w-full rounded-2xl border border-white/60 bg-white/70 px-4 py-3 text-sm font-medium outline-none transition focus:border-violet-400";
+    "peer w-full rounded-2xl border border-white/70 bg-white/60 px-4 pb-2.5 pt-6 text-sm font-semibold outline-none backdrop-blur-md transition-all duration-300 focus:border-violet-400 focus:bg-white/85 focus:shadow-[0_10px_30px_-12px_rgba(109,40,217,0.45)]";
+
+  const fields = [
+    { v: name, set: setName, ph: t.name, type: "text", icon: "👤", d: 0 },
+    { v: surname, set: setSurname, ph: t.surname, type: "text", icon: "🪪", d: 90 },
+    { v: phone, set: setPhone, ph: t.phone, type: "tel", icon: "📱", d: 180 },
+    { v: pass, set: setPass, ph: t.password, type: "password", icon: "🔒", d: 270 },
+  ];
 
   return (
     <div className="relative z-20 mx-auto flex min-h-screen max-w-md items-center px-4 pb-10 pt-28">
-      <div className="gw-panel w-full animate-[sheetUp_0.7s_cubic-bezier(0.16,1,0.3,1)_both] rounded-[2rem] p-6">
-        <h2 className="text-center text-2xl font-black">
-          <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent">
-            {t.registerTitle}
-          </span>
-        </h2>
-        <p className="mt-1 text-center text-xs opacity-70">{t.registerSub}</p>
+      <div className="relative w-full animate-[sheetUp_0.8s_cubic-bezier(0.16,1,0.3,1)_both]">
+        {/* soft aura behind the card */}
+        <div className="pointer-events-none absolute -inset-6 -z-10 rounded-[3rem] bg-[conic-gradient(from_0deg,rgba(167,139,250,0.35),rgba(96,165,250,0.35),rgba(244,182,255,0.35),rgba(167,139,250,0.35))] blur-3xl animate-[auraSpin_18s_linear_infinite]" />
 
-        <div className="mt-6 space-y-3">
-          {[
-            { v: name, set: setName, ph: t.name, type: "text", d: 0 },
-            { v: surname, set: setSurname, ph: t.surname, type: "text", d: 80 },
-            { v: phone, set: setPhone, ph: t.phone, type: "tel", d: 160 },
-            { v: pass, set: setPass, ph: t.password, type: "password", d: 240 },
-          ].map((f, i) => (
-            <input
-              key={i}
-              type={f.type}
-              value={f.v}
-              onChange={(e) => f.set(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && submit()}
-              placeholder={f.ph}
-              style={{ animationDelay: `${f.d}ms` }}
-              className={`${field} animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_both]`}
-            />
-          ))}
+        <div className="gw-panel relative overflow-hidden rounded-[2.25rem] p-7">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-violet-400/25 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-20 -left-14 h-44 w-44 rounded-full bg-blue-400/25 blur-3xl" />
+
+          <div className="relative flex flex-col items-center">
+            <div className="animate-[floaty_5s_ease-in-out_infinite] rounded-3xl bg-gradient-to-br from-violet-500 to-blue-500 px-4 py-3 text-2xl shadow-[0_16px_40px_-16px_rgba(79,70,229,0.8)]">
+              ✨
+            </div>
+            <h2 className="mt-4 text-center text-[1.7rem] font-black leading-tight">
+              <span className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-blue-600 bg-clip-text text-transparent">
+                {t.registerTitle}
+              </span>
+            </h2>
+            <p className="mt-1.5 text-center text-xs font-medium opacity-70">
+              {t.registerSub}
+            </p>
+            <div className="mt-4 h-px w-24 bg-gradient-to-r from-transparent via-violet-400/70 to-transparent" />
+          </div>
+
+          <div className="relative mt-6 space-y-3.5">
+            {fields.map((f, i) => (
+              <div
+                key={i}
+                className="relative animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_both]"
+                style={{ animationDelay: `${f.d}ms` }}
+              >
+                <input
+                  type={f.type}
+                  value={f.v}
+                  onChange={(e) => f.set(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && submit()}
+                  placeholder=" "
+                  className={field}
+                />
+                <span className="pointer-events-none absolute left-4 top-2 text-[10px] font-bold uppercase tracking-wide text-violet-500/80">
+                  {f.icon} {f.ph}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {error && (
+            <p className="mt-4 animate-[pop_0.35s_ease-out_both] rounded-xl border border-red-300/60 bg-red-500/10 p-2.5 text-center text-xs font-semibold text-red-600">
+              {error}
+            </p>
+          )}
+
+          <button
+            type="button"
+            onClick={submit}
+            data-on="true"
+            className="mt-6 w-full rounded-2xl px-4 py-3.5 text-sm font-black tracking-wide transition-transform duration-300 hover:-translate-y-0.5"
+          >
+            {t.createAccount} ✨
+          </button>
         </div>
-
-        {error && (
-          <p className="mt-3 rounded-xl border border-red-300/60 bg-red-500/10 p-2.5 text-center text-xs font-semibold text-red-600">
-            {error}
-          </p>
-        )}
-
-        <button
-          type="button"
-          onClick={submit}
-          data-on="true"
-          className="mt-5 w-full rounded-2xl px-4 py-3 text-sm font-black"
-        >
-          {t.createAccount} ✨
-        </button>
       </div>
     </div>
+
   );
 }
 
