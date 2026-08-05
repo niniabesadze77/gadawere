@@ -723,7 +723,7 @@ function BackgroundAnim({ effect, dim }: { effect: Weather; dim: boolean }) {
                 : undefined,
             fontSize:
               effect === "snow" || effect === "cherry" ? `${p.size}px` : undefined,
-            color: effect === "snow" ? "rgba(148,163,255,0.8)" : undefined,
+            color: effect === "snow" ? "rgba(109,126,232,0.95)" : undefined,
             background:
               effect === "bubbles"
                 ? "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95), rgba(186,230,253,0.45) 42%, rgba(129,180,255,0.18) 72%, rgba(255,255,255,0.05) 100%)"
