@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicSolveMathRouteImport } from './routes/api/public/solve-math'
+import { Route as ApiPublicPresentationGenerateRouteImport } from './routes/api/public/presentation-generate'
 import { Route as ApiPublicPracticeGenerateRouteImport } from './routes/api/public/practice-generate'
 import { Route as ApiPublicMathChatRouteImport } from './routes/api/public/math-chat'
 import { Route as ApiPublicImproveEssayRouteImport } from './routes/api/public/improve-essay'
@@ -26,6 +27,12 @@ const ApiPublicSolveMathRoute = ApiPublicSolveMathRouteImport.update({
   path: '/api/public/solve-math',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPresentationGenerateRoute =
+  ApiPublicPresentationGenerateRouteImport.update({
+    id: '/api/public/presentation-generate',
+    path: '/api/public/presentation-generate',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicPracticeGenerateRoute =
   ApiPublicPracticeGenerateRouteImport.update({
     id: '/api/public/practice-generate',
@@ -54,6 +61,7 @@ export interface FileRoutesByFullPath {
   '/api/public/improve-essay': typeof ApiPublicImproveEssayRoute
   '/api/public/math-chat': typeof ApiPublicMathChatRoute
   '/api/public/practice-generate': typeof ApiPublicPracticeGenerateRoute
+  '/api/public/presentation-generate': typeof ApiPublicPresentationGenerateRoute
   '/api/public/solve-math': typeof ApiPublicSolveMathRoute
 }
 export interface FileRoutesByTo {
@@ -62,6 +70,7 @@ export interface FileRoutesByTo {
   '/api/public/improve-essay': typeof ApiPublicImproveEssayRoute
   '/api/public/math-chat': typeof ApiPublicMathChatRoute
   '/api/public/practice-generate': typeof ApiPublicPracticeGenerateRoute
+  '/api/public/presentation-generate': typeof ApiPublicPresentationGenerateRoute
   '/api/public/solve-math': typeof ApiPublicSolveMathRoute
 }
 export interface FileRoutesById {
@@ -71,6 +80,7 @@ export interface FileRoutesById {
   '/api/public/improve-essay': typeof ApiPublicImproveEssayRoute
   '/api/public/math-chat': typeof ApiPublicMathChatRoute
   '/api/public/practice-generate': typeof ApiPublicPracticeGenerateRoute
+  '/api/public/presentation-generate': typeof ApiPublicPresentationGenerateRoute
   '/api/public/solve-math': typeof ApiPublicSolveMathRoute
 }
 export interface FileRouteTypes {
@@ -81,6 +91,7 @@ export interface FileRouteTypes {
     | '/api/public/improve-essay'
     | '/api/public/math-chat'
     | '/api/public/practice-generate'
+    | '/api/public/presentation-generate'
     | '/api/public/solve-math'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -89,6 +100,7 @@ export interface FileRouteTypes {
     | '/api/public/improve-essay'
     | '/api/public/math-chat'
     | '/api/public/practice-generate'
+    | '/api/public/presentation-generate'
     | '/api/public/solve-math'
   id:
     | '__root__'
@@ -97,6 +109,7 @@ export interface FileRouteTypes {
     | '/api/public/improve-essay'
     | '/api/public/math-chat'
     | '/api/public/practice-generate'
+    | '/api/public/presentation-generate'
     | '/api/public/solve-math'
   fileRoutesById: FileRoutesById
 }
@@ -106,6 +119,7 @@ export interface RootRouteChildren {
   ApiPublicImproveEssayRoute: typeof ApiPublicImproveEssayRoute
   ApiPublicMathChatRoute: typeof ApiPublicMathChatRoute
   ApiPublicPracticeGenerateRoute: typeof ApiPublicPracticeGenerateRoute
+  ApiPublicPresentationGenerateRoute: typeof ApiPublicPresentationGenerateRoute
   ApiPublicSolveMathRoute: typeof ApiPublicSolveMathRoute
 }
 
@@ -123,6 +137,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/solve-math'
       fullPath: '/api/public/solve-math'
       preLoaderRoute: typeof ApiPublicSolveMathRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/presentation-generate': {
+      id: '/api/public/presentation-generate'
+      path: '/api/public/presentation-generate'
+      fullPath: '/api/public/presentation-generate'
+      preLoaderRoute: typeof ApiPublicPresentationGenerateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/practice-generate': {
@@ -162,6 +183,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicImproveEssayRoute: ApiPublicImproveEssayRoute,
   ApiPublicMathChatRoute: ApiPublicMathChatRoute,
   ApiPublicPracticeGenerateRoute: ApiPublicPracticeGenerateRoute,
+  ApiPublicPresentationGenerateRoute: ApiPublicPresentationGenerateRoute,
   ApiPublicSolveMathRoute: ApiPublicSolveMathRoute,
 }
 export const routeTree = rootRouteImport
