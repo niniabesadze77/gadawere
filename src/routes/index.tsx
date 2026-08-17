@@ -11,6 +11,16 @@ import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { DICT, type Dict, type Lang } from "@/lib/i18n";
+import {
+  Card,
+  ErrorNote,
+  LangCtx,
+  Panel,
+  friendlyApiError,
+  useT,
+} from "@/lib/ui";
+import { EssayStudio } from "@/components/EssayStudio";
+import { PresentationStudio } from "@/components/PresentationStudio";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,11 +42,7 @@ export const Route = createFileRoute("/")({
 
 /* ---------------- i18n context ---------------- */
 
-const LangCtx = createContext<{ lang: Lang; t: Dict }>({
-  lang: "ka",
-  t: DICT.ka as unknown as Dict,
-});
-const useT = () => useContext(LangCtx);
+
 
 /* ---------------- constants ---------------- */
 
@@ -67,6 +73,14 @@ const MATH_SYMBOLS = [
   "%", "x²", "a/b", "∠", "Ω",
 ];
 
+type Tool = "essay" | "presentation" | "soon";
+
+const TOOLS: { id: Tool; emoji: string; active: boolean }[] = [
+  { id: "essay", emoji: "📝", active: true },
+  { id: "presentation", emoji: "🖼️", active: true },
+  { id: "soon", emoji: "✨", active: false },
+];
+
 type Account = { name: string; surname: string; phone: string; pass: string };
 
 /* ---------------- root ---------------- */
@@ -76,7 +90,7 @@ function Home() {
     "intro" | "auth" | "signing" | "ready"
   >("intro");
   const [account, setAccount] = useState<Account | null>(null);
-  const [selected, setSelected] = useState<Subject | null>(null);
+  const [selected, setSelected] = useState<Tool | null>(null);
   const [menu, setMenu] = useState(false);
   const [dark, setDark] = useState(false);
   const [lang, setLang] = useState<Lang>("ka");
@@ -138,7 +152,12 @@ function Home() {
       <div className="gw-root relative min-h-screen overflow-hidden text-slate-900">
         {/* Background layers — always behind everything */}
         <BackgroundAnim effect={weather} dim={!!selected} />
-        {selected && <SubjectGlyphs subject={selected} lang={lang} />}
+        {selected && (
+          <SubjectGlyphs
+            subject={selected === "presentation" ? "math" : "georgian"}
+            lang={lang}
+          />
+        )}
 
         <div className="pointer-events-none fixed -left-24 top-0 -z-10 h-72 w-72 rounded-full bg-violet-300/40 blur-3xl" />
         <div className="pointer-events-none fixed -right-24 top-40 -z-10 h-72 w-72 rounded-full bg-blue-300/40 blur-3xl" />
@@ -260,9 +279,9 @@ function Home() {
 
             <div className="animate-[fadeUp_0.9s_cubic-bezier(0.16,1,0.3,1)_both]">
               {!selected ? (
-                <SubjectPicker onPick={(s) => setSelected(s)} />
+                <ToolPicker onPick={(s) => setSelected(s)} />
               ) : (
-                <SubjectView subject={selected} onBack={() => setSelected(null)} />
+                <ToolView tool={selected} onBack={() => setSelected(null)} />
               )}
             </div>
 
@@ -990,6 +1009,72 @@ function InstallApp() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ---------------- tools ---------------- */
+
+function ToolPicker({ onPick }: { onPick: (s: Tool) => void }) {
+  const { t } = useT();
+  return (
+    <div>
+      <h2 className="text-center text-3xl font-black tracking-tight sm:text-4xl">
+        {t.toolsA}{" "}
+        <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent">
+          {t.toolsB}
+        </span>
+      </h2>
+      <p className="mt-2 text-center text-sm text-slate-500">{t.toolsHint}</p>
+
+      <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {TOOLS.map((s, i) => (
+          <button
+            key={s.id}
+            type="button"
+            disabled={!s.active}
+            onClick={() => s.active && onPick(s.id)}
+            style={{ animationDelay: `${i * 90}ms` }}
+            className={`gw-glass group relative overflow-hidden rounded-3xl p-5 text-left transition-all duration-500 animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_both] ${
+              s.active ? "hover:-translate-y-1" : "cursor-not-allowed opacity-60"
+            }`}
+          >
+            <div className="relative">
+              <div className="text-4xl transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
+                {s.emoji}
+              </div>
+              <div className="mt-3 text-lg font-black">{t.tools[s.id].label}</div>
+              <div className="mt-1 text-xs opacity-70">{t.tools[s.id].desc}</div>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ToolView({ tool, onBack }: { tool: Tool; onBack: () => void }) {
+  const { t } = useT();
+  return (
+    <div className="animate-[sheetUp_0.7s_cubic-bezier(0.16,1,0.3,1)_both]">
+      <button
+        type="button"
+        onClick={onBack}
+        className="gw-glass mb-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold"
+      >
+        {t.backToTools}
+      </button>
+      <h2 className="mb-4 text-2xl font-black">
+        <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent">
+          {tool === "essay" ? t.essayStudio : t.presStudio}
+        </span>
+      </h2>
+      <Panel>
+        <div key={tool} className="animate-[fadeIn_0.45s_ease-out_both]">
+          {tool === "essay" && <EssayStudio />}
+          {tool === "presentation" && <PresentationStudio />}
+        </div>
+      </Panel>
     </div>
   );
 }
@@ -2144,32 +2229,3 @@ function Markdown({ children }: { children: string }) {
   );
 }
 
-function Panel({ children }: { children: React.ReactNode }) {
-  return <div className="gw-panel rounded-3xl p-4 sm:p-5">{children}</div>;
-}
-
-function Card({
-  children,
-  className = "",
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return <div className={`gw-card rounded-3xl p-4 ${className}`}>{children}</div>;
-}
-
-async function friendlyApiError(res: Response, t: { errorGeneric: string; errorBusy: string; errorLimit: string }) {
-  let raw = "";
-  try {
-    raw = await res.text();
-  } catch {
-    raw = "";
-  }
-  if (res.status === 429) return t.errorBusy;
-  if (res.status === 402 || /not enough credits|payment_required|limit/i.test(raw)) return t.errorLimit;
-  return t.errorGeneric;
-}
-
-function ErrorNote({ text }: { text: string }) {
-  return <p className="gw-note gw-note-bad mt-3 text-sm">{text}</p>;
-}

@@ -144,7 +144,6 @@ export function PresentationStudio() {
 
       <Card
         className="animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_both]"
-        style-data="slides"
       >
         <label className="block px-1 pb-2 text-xs font-bold text-violet-600">
           {t.presSlides}
