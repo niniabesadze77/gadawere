@@ -305,6 +305,8 @@ function DeckEditor({
   const { t } = useT();
   const [panel, setPanel] = useState(false);
   const [target, setTarget] = useState<"bg" | "accent" | "text">("bg");
+  const [fmt, setFmt] = useState<"pptx" | "pdf" | "html">("pptx");
+  const [busy, setBusy] = useState(false);
 
   const theme = deck.theme;
   const setTheme = (patch: Partial<Theme>) =>
@@ -317,14 +319,15 @@ function DeckEditor({
     });
   }
 
-  function download() {
-    const html = buildHtml(deck, photos);
-    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `${(deck.title || "presentation").replace(/[^\p{L}\p{N} _-]/gu, "")}.html`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  async function download() {
+    setBusy(true);
+    try {
+      if (fmt === "pptx") await exportPptx(deck, photos);
+      else if (fmt === "html") downloadHtml(buildHtml(deck, photos), deck.title);
+      else printPdf(buildHtml(deck, photos));
+    } finally {
+      setBusy(false);
+    }
   }
 
   const current = theme[target];
@@ -337,26 +340,57 @@ function DeckEditor({
             {t.presReady}
           </span>
         </span>
-        <div className="ml-auto flex gap-2">
-          <button
-            type="button"
-            onClick={() => setPanel(!panel)}
-            className="gw-glass rounded-full px-3 py-1.5 text-[11px] font-bold"
-          >
-            {t.presCustomize}
-          </button>
-          <button
-            type="button"
-            onClick={download}
-            data-on="true"
-            className="rounded-full px-3 py-1.5 text-[11px] font-bold"
-          >
-            {t.presDownload}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setPanel(!panel)}
+          className="gw-glass ml-auto rounded-full px-3 py-1.5 text-[11px] font-bold"
+        >
+          {t.presCustomize}
+        </button>
       </div>
 
+      <Card className="rounded-[1.75rem]">
+        <label className="block px-1 pb-2 text-xs font-bold text-violet-600">
+          {t.presFormat}
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {(
+            [
+              ["pptx", t.fmtPptx],
+              ["pdf", t.fmtPdf],
+              ["html", t.fmtHtml],
+            ] as const
+          ).map(([k, label]) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setFmt(k)}
+              data-on={fmt === k}
+              className="gw-opt rounded-full px-3.5 py-1.5 text-[11px] font-bold"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={download}
+          disabled={busy}
+          data-on="true"
+          className="mt-3 w-full rounded-2xl px-4 py-3 text-sm font-black transition-transform duration-300 hover:-translate-y-0.5 disabled:opacity-60"
+        >
+          {t.presDownload}
+        </button>
+        {fmt === "pdf" && (
+          <p className="mt-2 px-1 text-[11px] font-semibold opacity-60">
+            {t.presPdfHint}
+          </p>
+        )}
+      </Card>
+
       <p className="text-[11px] font-semibold opacity-60">{t.presEditHint}</p>
+
+
 
       {panel && (
         <Card className="animate-[fadeUp_0.4s_ease-out_both]">
