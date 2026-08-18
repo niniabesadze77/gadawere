@@ -2,6 +2,8 @@ import { useRef, useState } from "react";
 import { ShadeSlider, Wheel, hexToHsva, hsvaToHex } from "@uiw/react-color";
 import { Card, ErrorNote, friendlyApiError, useT } from "@/lib/ui";
 import { ProgressRing } from "@/components/EssayStudio";
+import { downloadHtml, exportPptx, printPdf } from "@/lib/deckExport";
+
 
 type PhotoItem = { url: string; note: string };
 
