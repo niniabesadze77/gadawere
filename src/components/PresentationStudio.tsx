@@ -518,64 +518,84 @@ function SlideCard({
 
   return (
     <div
-      className="overflow-hidden rounded-3xl shadow-[0_22px_50px_-28px_rgba(30,27,75,0.7)]"
-      style={{ background: th.bg, fontFamily: th.font, color: th.text }}
+      className="relative overflow-hidden rounded-[1.5rem] shadow-[0_26px_60px_-30px_rgba(30,27,75,0.75)] ring-1 ring-black/5"
+      style={{
+        background: th.bg,
+        fontFamily: th.font,
+        color: th.text,
+        aspectRatio: "16 / 9",
+      }}
     >
       <div
-        className="h-1.5 w-full"
-        style={{ background: th.gradient || `linear-gradient(90deg, ${th.accent}, ${th.bg})` }}
+        className="absolute left-0 top-0 h-full w-1.5"
+        style={{ background: th.gradient || th.accent }}
       />
-      <div className="relative p-5">
-        <div
-          className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-25 blur-2xl"
-          style={{ background: th.accent }}
-        />
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest opacity-60">
+      <div
+        className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full opacity-20 blur-3xl"
+        style={{ background: th.accent }}
+      />
+      <div className="relative flex h-full flex-col p-5 pl-7">
+        <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.22em] opacity-55">
           <span>
             {t.slide} {index + 1}
           </span>
-          <span>{slide.emoji}</span>
+          <span className="opacity-90">{slide.emoji}</span>
         </div>
 
         <h3
           contentEditable
           suppressContentEditableWarning
           onBlur={(e) => onChange({ title: e.currentTarget.textContent ?? "" })}
-          className="mt-1.5 text-xl font-black outline-none"
+          className="mt-1 text-lg font-black leading-tight tracking-tight outline-none sm:text-xl"
           style={{ color: th.accent }}
         >
           {slide.title}
         </h3>
+        <span
+          className="mt-1.5 block h-[3px] w-10 rounded-full"
+          style={{ background: th.accent, opacity: 0.85 }}
+        />
 
-        {photo && (
-          <img
-            src={photo}
-            alt=""
-            className="mt-3 max-h-52 w-full rounded-2xl object-cover"
-          />
-        )}
-
-        <ul className="mt-3 space-y-1.5">
-          {slide.bullets.map((b, i) => (
-            <li key={i} className="flex gap-2 text-sm leading-relaxed">
-              <span style={{ color: th.accent }}>◆</span>
-              <span
-                contentEditable
-                suppressContentEditableWarning
-                onBlur={(e) =>
-                  onChange({
-                    bullets: slide.bullets.map((x, j) =>
-                      j === i ? (e.currentTarget.textContent ?? "") : x,
-                    ),
-                  })
-                }
-                className="flex-1 outline-none"
+        <div
+          className={`mt-2.5 flex min-h-0 flex-1 gap-3 ${photo ? "" : "flex-col"}`}
+        >
+          <ul className="min-w-0 flex-1 space-y-1.5 overflow-hidden">
+            {slide.bullets.map((b, i) => (
+              <li
+                key={i}
+                className="flex gap-2 text-[12px] leading-snug sm:text-[13px]"
               >
-                {b}
-              </span>
-            </li>
-          ))}
-        </ul>
+                <span
+                  className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full"
+                  style={{ background: th.accent }}
+                />
+                <span
+                  contentEditable
+                  suppressContentEditableWarning
+                  onBlur={(e) =>
+                    onChange({
+                      bullets: slide.bullets.map((x, j) =>
+                        j === i ? (e.currentTarget.textContent ?? "") : x,
+                      ),
+                    })
+                  }
+                  className="flex-1 outline-none"
+                >
+                  {b}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          {photo && (
+            <img
+              src={photo}
+              alt=""
+              className="h-full w-[38%] shrink-0 rounded-xl object-cover"
+            />
+          )}
+        </div>
+
 
         {slide.note && (
           <p className="mt-3 text-[11px] italic opacity-60">{slide.note}</p>
