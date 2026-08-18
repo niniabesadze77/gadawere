@@ -595,11 +595,12 @@ function SlideCard({
             />
           )}
         </div>
-
-
         {slide.note && (
-          <p className="mt-3 text-[11px] italic opacity-60">{slide.note}</p>
+          <p className="mt-2 line-clamp-2 text-[10px] italic opacity-55">
+            {slide.note}
+          </p>
         )}
+
       </div>
     </div>
   );
