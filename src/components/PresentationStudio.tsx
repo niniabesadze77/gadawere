@@ -2,6 +2,8 @@ import { useRef, useState } from "react";
 import { ShadeSlider, Wheel, hexToHsva, hsvaToHex } from "@uiw/react-color";
 import { Card, ErrorNote, friendlyApiError, useT } from "@/lib/ui";
 import { ProgressRing } from "@/components/EssayStudio";
+import { downloadHtml, exportPptx, printPdf } from "@/lib/deckExport";
+
 
 type PhotoItem = { url: string; note: string };
 
@@ -305,6 +307,8 @@ function DeckEditor({
   const { t } = useT();
   const [panel, setPanel] = useState(false);
   const [target, setTarget] = useState<"bg" | "accent" | "text">("bg");
+  const [fmt, setFmt] = useState<"pptx" | "pdf" | "html">("pptx");
+  const [busy, setBusy] = useState(false);
 
   const theme = deck.theme;
   const setTheme = (patch: Partial<Theme>) =>
@@ -317,14 +321,15 @@ function DeckEditor({
     });
   }
 
-  function download() {
-    const html = buildHtml(deck, photos);
-    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `${(deck.title || "presentation").replace(/[^\p{L}\p{N} _-]/gu, "")}.html`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  async function download() {
+    setBusy(true);
+    try {
+      if (fmt === "pptx") await exportPptx(deck, photos);
+      else if (fmt === "html") downloadHtml(buildHtml(deck, photos), deck.title);
+      else printPdf(buildHtml(deck, photos));
+    } finally {
+      setBusy(false);
+    }
   }
 
   const current = theme[target];
@@ -337,26 +342,57 @@ function DeckEditor({
             {t.presReady}
           </span>
         </span>
-        <div className="ml-auto flex gap-2">
-          <button
-            type="button"
-            onClick={() => setPanel(!panel)}
-            className="gw-glass rounded-full px-3 py-1.5 text-[11px] font-bold"
-          >
-            {t.presCustomize}
-          </button>
-          <button
-            type="button"
-            onClick={download}
-            data-on="true"
-            className="rounded-full px-3 py-1.5 text-[11px] font-bold"
-          >
-            {t.presDownload}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setPanel(!panel)}
+          className="gw-glass ml-auto rounded-full px-3 py-1.5 text-[11px] font-bold"
+        >
+          {t.presCustomize}
+        </button>
       </div>
 
+      <Card className="rounded-[1.75rem]">
+        <label className="block px-1 pb-2 text-xs font-bold text-violet-600">
+          {t.presFormat}
+        </label>
+        <div className="flex flex-wrap gap-2">
+          {(
+            [
+              ["pptx", t.fmtPptx],
+              ["pdf", t.fmtPdf],
+              ["html", t.fmtHtml],
+            ] as const
+          ).map(([k, label]) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setFmt(k)}
+              data-on={fmt === k}
+              className="gw-opt rounded-full px-3.5 py-1.5 text-[11px] font-bold"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={download}
+          disabled={busy}
+          data-on="true"
+          className="mt-3 w-full rounded-2xl px-4 py-3 text-sm font-black transition-transform duration-300 hover:-translate-y-0.5 disabled:opacity-60"
+        >
+          {t.presDownload}
+        </button>
+        {fmt === "pdf" && (
+          <p className="mt-2 px-1 text-[11px] font-semibold opacity-60">
+            {t.presPdfHint}
+          </p>
+        )}
+      </Card>
+
       <p className="text-[11px] font-semibold opacity-60">{t.presEditHint}</p>
+
+
 
       {panel && (
         <Card className="animate-[fadeUp_0.4s_ease-out_both]">
@@ -482,68 +518,89 @@ function SlideCard({
 
   return (
     <div
-      className="overflow-hidden rounded-3xl shadow-[0_22px_50px_-28px_rgba(30,27,75,0.7)]"
-      style={{ background: th.bg, fontFamily: th.font, color: th.text }}
+      className="relative overflow-hidden rounded-[1.5rem] shadow-[0_26px_60px_-30px_rgba(30,27,75,0.75)] ring-1 ring-black/5"
+      style={{
+        background: th.bg,
+        fontFamily: th.font,
+        color: th.text,
+        aspectRatio: "16 / 9",
+      }}
     >
       <div
-        className="h-1.5 w-full"
-        style={{ background: th.gradient || `linear-gradient(90deg, ${th.accent}, ${th.bg})` }}
+        className="absolute left-0 top-0 h-full w-1.5"
+        style={{ background: th.gradient || th.accent }}
       />
-      <div className="relative p-5">
-        <div
-          className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-25 blur-2xl"
-          style={{ background: th.accent }}
-        />
-        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest opacity-60">
+      <div
+        className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full opacity-20 blur-3xl"
+        style={{ background: th.accent }}
+      />
+      <div className="relative flex h-full flex-col p-5 pl-7">
+        <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.22em] opacity-55">
           <span>
             {t.slide} {index + 1}
           </span>
-          <span>{slide.emoji}</span>
+          <span className="opacity-90">{slide.emoji}</span>
         </div>
 
         <h3
           contentEditable
           suppressContentEditableWarning
           onBlur={(e) => onChange({ title: e.currentTarget.textContent ?? "" })}
-          className="mt-1.5 text-xl font-black outline-none"
+          className="mt-1 text-lg font-black leading-tight tracking-tight outline-none sm:text-xl"
           style={{ color: th.accent }}
         >
           {slide.title}
         </h3>
+        <span
+          className="mt-1.5 block h-[3px] w-10 rounded-full"
+          style={{ background: th.accent, opacity: 0.85 }}
+        />
 
-        {photo && (
-          <img
-            src={photo}
-            alt=""
-            className="mt-3 max-h-52 w-full rounded-2xl object-cover"
-          />
-        )}
-
-        <ul className="mt-3 space-y-1.5">
-          {slide.bullets.map((b, i) => (
-            <li key={i} className="flex gap-2 text-sm leading-relaxed">
-              <span style={{ color: th.accent }}>◆</span>
-              <span
-                contentEditable
-                suppressContentEditableWarning
-                onBlur={(e) =>
-                  onChange({
-                    bullets: slide.bullets.map((x, j) =>
-                      j === i ? (e.currentTarget.textContent ?? "") : x,
-                    ),
-                  })
-                }
-                className="flex-1 outline-none"
+        <div
+          className={`mt-2.5 flex min-h-0 flex-1 gap-3 ${photo ? "" : "flex-col"}`}
+        >
+          <ul className="min-w-0 flex-1 space-y-1.5 overflow-hidden">
+            {slide.bullets.map((b, i) => (
+              <li
+                key={i}
+                className="flex gap-2 text-[12px] leading-snug sm:text-[13px]"
               >
-                {b}
-              </span>
-            </li>
-          ))}
-        </ul>
+                <span
+                  className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full"
+                  style={{ background: th.accent }}
+                />
+                <span
+                  contentEditable
+                  suppressContentEditableWarning
+                  onBlur={(e) =>
+                    onChange({
+                      bullets: slide.bullets.map((x, j) =>
+                        j === i ? (e.currentTarget.textContent ?? "") : x,
+                      ),
+                    })
+                  }
+                  className="flex-1 outline-none"
+                >
+                  {b}
+                </span>
+              </li>
+            ))}
+          </ul>
 
+          {photo && (
+            <img
+              src={photo}
+              alt=""
+              className="h-full w-[38%] shrink-0 rounded-xl object-cover"
+            />
+          )}
+        </div>
         {slide.note && (
-          <p className="mt-3 text-[11px] italic opacity-60">{slide.note}</p>
+          <p className="mt-2 line-clamp-2 text-[10px] italic opacity-55">
+            {slide.note}
+          </p>
         )}
+
       </div>
     </div>
   );
@@ -567,12 +624,16 @@ function buildHtml(deck: Deck, photos: PhotoItem[]) {
       return `<section class="slide">
   <div class="bar"></div>
   <div class="inner">
-    <div class="tag">${i + 1} ${esc(s.emoji ?? "")}</div>
+    <div class="tag">${esc(s.emoji ?? "")} ${i + 1}</div>
     <h2>${esc(s.title)}</h2>
-    ${img}
-    <ul>${s.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
+    <span class="rule"></span>
+    <div class="body${img ? " split" : ""}">
+      <ul>${s.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
+      ${img}
+    </div>
     ${s.note ? `<p class="note">${esc(s.note)}</p>` : ""}
   </div>
+  <div class="pg">${i + 1}</div>
 </section>`;
     })
     .join("\n");
@@ -582,24 +643,37 @@ function buildHtml(deck: Deck, photos: PhotoItem[]) {
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${esc(deck.title)}</title>
 <style>
-  body { margin:0; background:#0f172a; font-family:${th.font}; }
-  .deck { max-width: 1100px; margin: 0 auto; padding: 32px 16px; }
-  h1 { color:#fff; text-align:center; font-size:34px; margin:0 0 6px; }
-  .sub { color:#c7d2fe; text-align:center; margin:0 0 28px; }
-  .slide { background:${th.bg}; color:${th.text}; border-radius:22px; overflow:hidden; margin-bottom:26px; box-shadow:0 20px 50px -25px rgba(0,0,0,.8); page-break-after:always; }
-  .bar { height:8px; background:${th.gradient || `linear-gradient(90deg, ${th.accent}, ${th.bg})`}; }
-  .inner { padding:34px 38px; }
-  .tag { font-size:11px; letter-spacing:.18em; text-transform:uppercase; opacity:.6; }
-  h2 { color:${th.accent}; font-size:30px; margin:8px 0 14px; }
-  img { width:100%; max-height:420px; object-fit:cover; border-radius:16px; margin-bottom:14px; }
-  ul { margin:0; padding-left:20px; line-height:1.7; font-size:17px; }
+  @page { size: 297mm 167mm; margin: 0; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:#0f172a; font-family:${th.font}; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .deck { max-width: 1120px; margin: 0 auto; padding: 28px 16px 40px; }
+  .cover { background:${th.bg}; color:${th.text}; border-radius:20px; padding:70px 56px; margin-bottom:26px; position:relative; overflow:hidden; page-break-after:always; }
+  .cover:before { content:""; position:absolute; left:0; top:0; bottom:0; width:10px; background:${th.gradient || th.accent}; }
+  h1 { font-size:44px; margin:0 0 10px; letter-spacing:-.02em; }
+  .sub { color:${th.accent}; margin:0; font-size:18px; }
+  .slide { position:relative; background:${th.bg}; color:${th.text}; border-radius:20px; overflow:hidden; margin-bottom:26px; box-shadow:0 20px 50px -25px rgba(0,0,0,.8); page-break-after:always; aspect-ratio: 16/9; }
+  .bar { position:absolute; left:0; top:0; bottom:0; width:10px; background:${th.gradient || th.accent}; }
+  .inner { padding:40px 48px 34px 58px; }
+  .tag { font-size:11px; letter-spacing:.22em; text-transform:uppercase; opacity:.55; }
+  h2 { color:${th.accent}; font-size:32px; margin:6px 0 0; letter-spacing:-.02em; }
+  .rule { display:block; width:52px; height:4px; border-radius:4px; background:${th.accent}; margin:12px 0 18px; }
+  .body { display:flex; gap:26px; }
+  .body ul { flex:1; }
+  .body.split img { width:38%; align-self:stretch; }
+  img { object-fit:cover; border-radius:14px; max-height:330px; }
+  ul { margin:0; padding-left:20px; line-height:1.75; font-size:18px; }
+  li { margin-bottom:6px; }
   li::marker { color:${th.accent}; }
-  .note { font-size:13px; font-style:italic; opacity:.6; }
-  @media print { body { background:#fff; } .slide { box-shadow:none; margin:0; } }
+  .note { font-size:13px; font-style:italic; opacity:.55; margin-top:18px; }
+  .pg { position:absolute; right:26px; bottom:18px; font-size:12px; color:${th.accent}; }
+  @media print { body { background:#fff; } .deck { padding:0; max-width:none; } .slide, .cover { box-shadow:none; margin:0; border-radius:0; } }
 </style></head>
 <body><div class="deck">
-<h1>${esc(deck.title)}</h1>
-<p class="sub">${esc(deck.subtitle ?? "")}</p>
+<section class="cover">
+  <h1>${esc(deck.title)}</h1>
+  <p class="sub">${esc(deck.subtitle ?? "")}</p>
+</section>
 ${slides}
 </div></body></html>`;
 }
+

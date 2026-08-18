@@ -83,7 +83,72 @@ const TOOLS: { id: Tool; emoji: string; active: boolean }[] = [
 
 type Account = { name: string; surname: string; phone: string; pass: string };
 
+/* ---------------- typing logo ---------------- */
+
+function playKeyClick(ac: AudioContext) {
+  const now = ac.currentTime;
+  const osc = ac.createOscillator();
+  const gain = ac.createGain();
+  osc.type = "square";
+  osc.frequency.setValueAtTime(1650 + Math.random() * 350, now);
+  osc.frequency.exponentialRampToValueAtTime(520, now + 0.045);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.09, now + 0.006);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+  osc.connect(gain).connect(ac.destination);
+  osc.start(now);
+  osc.stop(now + 0.08);
+}
+
+function TypedBrand({ text, onDone }: { text: string; onDone: () => void }) {
+  const [count, setCount] = useState(0);
+  const acRef = useRef<AudioContext | null>(null);
+  const doneRef = useRef(false);
+
+  useEffect(() => {
+    const Ctx =
+      window.AudioContext ??
+      (window as unknown as { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
+    if (Ctx) acRef.current = new Ctx();
+    const resume = () => void acRef.current?.resume();
+    window.addEventListener("pointerdown", resume, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", resume);
+      void acRef.current?.close();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (count >= text.length) {
+      if (doneRef.current) return;
+      doneRef.current = true;
+      const id = setTimeout(onDone, 900);
+      return () => clearTimeout(id);
+    }
+    const id = setTimeout(
+      () => {
+        const ac = acRef.current;
+        if (ac && ac.state === "running") playKeyClick(ac);
+        setCount((c) => c + 1);
+      },
+      count === 0 ? 420 : 115 + Math.random() * 70,
+    );
+    return () => clearTimeout(id);
+  }, [count, text, onDone]);
+
+  return (
+    <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-3xl font-black tracking-tight text-transparent">
+      {text.slice(0, count)}
+      <span className="ml-0.5 inline-block w-[2px] animate-[breathe_1s_ease-in-out_infinite] bg-gradient-to-b from-violet-600 to-blue-600 align-middle text-transparent">
+        |
+      </span>
+    </span>
+  );
+}
+
 /* ---------------- root ---------------- */
+
 
 function Home() {
   const [phase, setPhase] = useState<
@@ -227,9 +292,14 @@ function Home() {
               </>
             )}
             <div className="absolute inset-0 -z-10 animate-[glowPulse_5s_ease-in-out_infinite] rounded-full bg-gradient-to-r from-violet-400 to-blue-400 opacity-40 blur-2xl" />
-            <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-2xl font-black tracking-tight text-transparent">
-              {t.brand}
-            </span>
+            {phase === "intro" ? (
+              <TypedBrand text={t.brand} onDone={advance} />
+            ) : (
+              <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-2xl font-black tracking-tight text-transparent">
+                {t.brand}
+              </span>
+            )}
+
           </button>
         </div>
 
