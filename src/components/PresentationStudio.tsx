@@ -624,12 +624,16 @@ function buildHtml(deck: Deck, photos: PhotoItem[]) {
       return `<section class="slide">
   <div class="bar"></div>
   <div class="inner">
-    <div class="tag">${i + 1} ${esc(s.emoji ?? "")}</div>
+    <div class="tag">${esc(s.emoji ?? "")} ${i + 1}</div>
     <h2>${esc(s.title)}</h2>
-    ${img}
-    <ul>${s.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
+    <span class="rule"></span>
+    <div class="body${img ? " split" : ""}">
+      <ul>${s.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
+      ${img}
+    </div>
     ${s.note ? `<p class="note">${esc(s.note)}</p>` : ""}
   </div>
+  <div class="pg">${i + 1}</div>
 </section>`;
     })
     .join("\n");
@@ -639,24 +643,37 @@ function buildHtml(deck: Deck, photos: PhotoItem[]) {
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${esc(deck.title)}</title>
 <style>
-  body { margin:0; background:#0f172a; font-family:${th.font}; }
-  .deck { max-width: 1100px; margin: 0 auto; padding: 32px 16px; }
-  h1 { color:#fff; text-align:center; font-size:34px; margin:0 0 6px; }
-  .sub { color:#c7d2fe; text-align:center; margin:0 0 28px; }
-  .slide { background:${th.bg}; color:${th.text}; border-radius:22px; overflow:hidden; margin-bottom:26px; box-shadow:0 20px 50px -25px rgba(0,0,0,.8); page-break-after:always; }
-  .bar { height:8px; background:${th.gradient || `linear-gradient(90deg, ${th.accent}, ${th.bg})`}; }
-  .inner { padding:34px 38px; }
-  .tag { font-size:11px; letter-spacing:.18em; text-transform:uppercase; opacity:.6; }
-  h2 { color:${th.accent}; font-size:30px; margin:8px 0 14px; }
-  img { width:100%; max-height:420px; object-fit:cover; border-radius:16px; margin-bottom:14px; }
-  ul { margin:0; padding-left:20px; line-height:1.7; font-size:17px; }
+  @page { size: 297mm 167mm; margin: 0; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:#0f172a; font-family:${th.font}; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .deck { max-width: 1120px; margin: 0 auto; padding: 28px 16px 40px; }
+  .cover { background:${th.bg}; color:${th.text}; border-radius:20px; padding:70px 56px; margin-bottom:26px; position:relative; overflow:hidden; page-break-after:always; }
+  .cover:before { content:""; position:absolute; left:0; top:0; bottom:0; width:10px; background:${th.gradient || th.accent}; }
+  h1 { font-size:44px; margin:0 0 10px; letter-spacing:-.02em; }
+  .sub { color:${th.accent}; margin:0; font-size:18px; }
+  .slide { position:relative; background:${th.bg}; color:${th.text}; border-radius:20px; overflow:hidden; margin-bottom:26px; box-shadow:0 20px 50px -25px rgba(0,0,0,.8); page-break-after:always; aspect-ratio: 16/9; }
+  .bar { position:absolute; left:0; top:0; bottom:0; width:10px; background:${th.gradient || th.accent}; }
+  .inner { padding:40px 48px 34px 58px; }
+  .tag { font-size:11px; letter-spacing:.22em; text-transform:uppercase; opacity:.55; }
+  h2 { color:${th.accent}; font-size:32px; margin:6px 0 0; letter-spacing:-.02em; }
+  .rule { display:block; width:52px; height:4px; border-radius:4px; background:${th.accent}; margin:12px 0 18px; }
+  .body { display:flex; gap:26px; }
+  .body ul { flex:1; }
+  .body.split img { width:38%; align-self:stretch; }
+  img { object-fit:cover; border-radius:14px; max-height:330px; }
+  ul { margin:0; padding-left:20px; line-height:1.75; font-size:18px; }
+  li { margin-bottom:6px; }
   li::marker { color:${th.accent}; }
-  .note { font-size:13px; font-style:italic; opacity:.6; }
-  @media print { body { background:#fff; } .slide { box-shadow:none; margin:0; } }
+  .note { font-size:13px; font-style:italic; opacity:.55; margin-top:18px; }
+  .pg { position:absolute; right:26px; bottom:18px; font-size:12px; color:${th.accent}; }
+  @media print { body { background:#fff; } .deck { padding:0; max-width:none; } .slide, .cover { box-shadow:none; margin:0; border-radius:0; } }
 </style></head>
 <body><div class="deck">
-<h1>${esc(deck.title)}</h1>
-<p class="sub">${esc(deck.subtitle ?? "")}</p>
+<section class="cover">
+  <h1>${esc(deck.title)}</h1>
+  <p class="sub">${esc(deck.subtitle ?? "")}</p>
+</section>
 ${slides}
 </div></body></html>`;
 }
+
