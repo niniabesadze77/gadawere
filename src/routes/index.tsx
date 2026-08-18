@@ -292,9 +292,14 @@ function Home() {
               </>
             )}
             <div className="absolute inset-0 -z-10 animate-[glowPulse_5s_ease-in-out_infinite] rounded-full bg-gradient-to-r from-violet-400 to-blue-400 opacity-40 blur-2xl" />
-            <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-2xl font-black tracking-tight text-transparent">
-              {t.brand}
-            </span>
+            {phase === "intro" ? (
+              <TypedBrand text={t.brand} onDone={advance} />
+            ) : (
+              <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-2xl font-black tracking-tight text-transparent">
+                {t.brand}
+              </span>
+            )}
+
           </button>
         </div>
 
