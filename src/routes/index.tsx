@@ -690,183 +690,93 @@ function SettingsMenu({
 function BackgroundAnim({ effect, dim }: { effect: Weather; dim: boolean }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-
-  const particles = useMemo(() => {
-    const count =
-      effect === "rain" ? 70 : effect === "snow" ? 50 : effect === "cherry" ? 26 : 22;
-    return Array.from({ length: count }, (_, i) => ({
-      i,
-      left: Math.random() * 100,
-      delay: Math.random() * 9,
-      duration:
-        effect === "rain"
-          ? 0.6 + Math.random() * 0.7
-          : effect === "cherry"
-            ? 9 + Math.random() * 9
-            : effect === "bubbles"
-              ? 9 + Math.random() * 10
-              : 7 + Math.random() * 9,
-      size:
-        effect === "snow"
-          ? 6 + Math.random() * 10
-          : effect === "cherry"
-            ? 9 + Math.random() * 9
-            : effect === "bubbles"
-              ? 14 + Math.random() * 42
-              : 1 + Math.random(),
-      drift: (Math.random() - 0.5) * 160,
-      spin: 240 + Math.random() * 480,
-    }));
-  }, [effect]);
-
-  const sunDust = useMemo(
-    () =>
-      Array.from({ length: 16 }, () => ({
-        top: Math.random() * 100,
-        left: Math.random() * 100,
-        dur: 9 + Math.random() * 8,
-        delay: Math.random() * 6,
-      })),
-    [effect],
-  );
-
   if (!mounted) return null;
 
-  const wrap = `pointer-events-none fixed inset-0 -z-10 overflow-hidden transition-all duration-700 ${
-    dim ? "opacity-45 blur-[6px]" : "opacity-100"
+  const wrap = `pointer-events-none fixed inset-0 -z-10 overflow-hidden transition-[opacity,filter] duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+    dim ? "opacity-50 blur-[10px]" : "opacity-100"
   }`;
-
-  if (effect === "sun") {
-    return (
-      <div className={wrap}>
-        {/* warm side wash */}
-        <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,236,170,0.55),rgba(255,246,214,0.22)_35%,transparent_65%)] animate-[sunWash_14s_ease-in-out_infinite]" />
-        {/* light source off-screen left */}
-        <div className="absolute -left-40 top-[12%] h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(255,242,190,0.95),rgba(255,221,120,0.35)_45%,transparent_72%)] animate-[sunPulse_9s_ease-in-out_infinite]" />
-        {/* sweeping beams from the side */}
-        <div className="absolute -left-32 top-[10%] h-[10rem] w-[10rem]">
-          {[...Array(9)].map((_, i) => (
-            <span
-              key={i}
-              className="absolute left-0 top-1/2 block origin-left rounded-full"
-              style={{
-                width: "190vw",
-                height: `${16 + (i % 3) * 22}px`,
-                background:
-                  "linear-gradient(90deg, rgba(255,240,180,0.55), rgba(255,236,160,0.18) 45%, transparent 80%)",
-                filter: "blur(10px)",
-                transform: `rotate(${8 + i * 5.5}deg)`,
-                animation: `beamSweep ${11 + i * 1.3}s ${i * 0.6}s ease-in-out infinite`,
-              }}
-            />
-          ))}
-        </div>
-        {sunDust.map((d, i) => (
-          <span
-            key={`d${i}`}
-            className="absolute h-1.5 w-1.5 rounded-full bg-yellow-200/80"
-            style={{
-              left: `${d.left}%`,
-              top: `${d.top}%`,
-              animation: `dustFloat ${d.dur}s ${d.delay}s ease-in-out infinite`,
-            }}
-          />
-        ))}
-        <style>{`
-          @keyframes sunPulse { 0%,100%{opacity:.7;transform:scale(1)} 50%{opacity:1;transform:scale(1.08)} }
-          @keyframes sunWash { 0%,100%{opacity:.55} 50%{opacity:.9} }
-          @keyframes beamSweep {
-            0%,100% { opacity:.25; transform: rotate(var(--r,10deg)) translateY(0) scaleY(.9); }
-            50% { opacity:.8; transform: rotate(calc(var(--r,10deg) + 4deg)) translateY(26px) scaleY(1.15); }
-          }
-          @keyframes dustFloat { 0%,100%{transform:translate(0,0);opacity:.2} 50%{transform:translate(22px,-30px);opacity:.85} }
-        `}</style>
-      </div>
-    );
-  }
-
-  const isRain = effect === "rain";
-  const glyph = effect === "snow" ? "❄" : effect === "cherry" ? "🌸" : "";
 
   return (
     <div className={wrap}>
-      {particles.map((p) => (
-        <span
-          key={p.i}
-          className={
-            isRain
-              ? "absolute rounded-full bg-gradient-to-b from-sky-400/70 to-sky-300/0"
-              : effect === "bubbles"
-                ? "absolute rounded-full"
-                : "absolute select-none"
-          }
-          style={{
-            left: `${p.left}%`,
-            top: effect === "bubbles" ? "105%" : "-10%",
-            width: isRain ? "1.6px" : effect === "bubbles" ? `${p.size}px` : undefined,
-            height: isRain
-              ? `${16 + p.size * 8}px`
-              : effect === "bubbles"
-                ? `${p.size}px`
-                : undefined,
-            fontSize:
-              effect === "snow" || effect === "cherry" ? `${p.size}px` : undefined,
-            color: effect === "snow" ? "rgba(109,126,232,0.95)" : undefined,
-            background:
-              effect === "bubbles"
-                ? "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95), rgba(186,230,253,0.45) 42%, rgba(129,180,255,0.18) 72%, rgba(255,255,255,0.05) 100%)"
-                : undefined,
-            boxShadow:
-              effect === "bubbles"
-                ? "inset 0 0 12px rgba(255,255,255,0.85), 0 4px 14px rgba(59,130,246,0.18)"
-                : undefined,
-            border: effect === "bubbles" ? "1px solid rgba(255,255,255,0.7)" : undefined,
-            animation: `${
-              isRain
-                ? "rainFall"
-                : effect === "bubbles"
-                  ? "bubbleRise"
-                  : effect === "cherry"
-                    ? "petalFall"
-                    : "flakeFall"
-            } ${p.duration}s ${p.delay}s ${isRain ? "linear" : "cubic-bezier(0.4,0,0.6,1)"} infinite`,
-            ["--drift" as never]: `${p.drift}px`,
-            ["--spin" as never]: `${p.spin}deg`,
-          }}
+      {effect !== "minimal" && (
+        <>
+          <span
+            className="absolute -left-[18%] -top-[22%] h-[70vmax] w-[70vmax] rounded-full opacity-70 blur-[90px]"
+            style={{
+              background:
+                "radial-gradient(circle at 40% 40%, rgba(167,139,250,0.55), rgba(167,139,250,0) 70%)",
+              animation: "auroraDrift 26s ease-in-out infinite",
+            }}
+          />
+          <span
+            className="absolute -right-[20%] top-[8%] h-[62vmax] w-[62vmax] rounded-full opacity-70 blur-[90px]"
+            style={{
+              background:
+                "radial-gradient(circle at 55% 45%, rgba(96,165,250,0.5), rgba(96,165,250,0) 70%)",
+              animation: "auroraDrift 32s ease-in-out infinite reverse",
+            }}
+          />
+          <span
+            className="absolute bottom-[-25%] left-[15%] h-[60vmax] w-[60vmax] rounded-full opacity-60 blur-[100px]"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 50%, rgba(244,182,255,0.45), rgba(244,182,255,0) 70%)",
+              animation: "auroraDrift 38s ease-in-out infinite",
+              animationDelay: "-8s",
+            }}
+          />
+        </>
+      )}
+
+      {effect === "waves" && (
+        <svg
+          className="absolute inset-x-0 bottom-0 h-[46vh] w-full opacity-[0.5]"
+          viewBox="0 0 1440 420"
+          preserveAspectRatio="none"
+          aria-hidden="true"
         >
-          {glyph || null}
-        </span>
-      ))}
+          {[
+            { fill: "rgba(139,92,246,0.20)", dur: "18s", y: 0 },
+            { fill: "rgba(59,130,246,0.18)", dur: "24s", y: 40 },
+            { fill: "rgba(216,180,254,0.20)", dur: "31s", y: 80 },
+          ].map((w, i) => (
+            <g key={i} style={{ animation: `waveSlide ${w.dur} linear infinite` }}>
+              <path
+                transform={`translate(0 ${w.y})`}
+                fill={w.fill}
+                d="M0,180 C240,120 480,240 720,180 C960,120 1200,240 1440,180 L1440,420 L0,420 Z"
+              />
+              <path
+                transform={`translate(1440 ${w.y})`}
+                fill={w.fill}
+                d="M0,180 C240,120 480,240 720,180 C960,120 1200,240 1440,180 L1440,420 L0,420 Z"
+              />
+            </g>
+          ))}
+        </svg>
+      )}
+
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.55),transparent_60%)]" />
+
       <style>{`
-        @keyframes rainFall {
-          0% { transform: translate3d(0,-12vh,0); opacity: 0; }
-          8% { opacity: .9; }
-          100% { transform: translate3d(-6vw,115vh,0); opacity: 0; }
+        @keyframes auroraDrift {
+          0%   { transform: translate3d(0,0,0) scale(1); }
+          33%  { transform: translate3d(6vw,4vh,0) scale(1.08); }
+          66%  { transform: translate3d(-4vw,-3vh,0) scale(0.96); }
+          100% { transform: translate3d(0,0,0) scale(1); }
         }
-        @keyframes flakeFall {
-          0% { transform: translate3d(0,-10vh,0) rotate(0deg); opacity: 0; }
-          10% { opacity: 1; }
-          50% { transform: translate3d(calc(var(--drift) * .6), 55vh, 0) rotate(calc(var(--spin) * .5)); }
-          100% { transform: translate3d(var(--drift),115vh,0) rotate(var(--spin)); opacity: 0; }
+        @keyframes waveSlide {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-1440px); }
         }
-        @keyframes petalFall {
-          0% { transform: translate3d(0,-10vh,0) rotate(0deg) scale(1); opacity: 0; }
-          10% { opacity: 1; }
-          35% { transform: translate3d(calc(var(--drift) * .5), 32vh, 0) rotate(120deg) scale(.9); }
-          65% { transform: translate3d(calc(var(--drift) * -.4), 66vh, 0) rotate(240deg) scale(1.05); }
-          100% { transform: translate3d(var(--drift),115vh,0) rotate(var(--spin)) scale(.95); opacity: 0; }
-        }
-        @keyframes bubbleRise {
-          0% { transform: translate3d(0,0,0) scale(.7); opacity: 0; }
-          12% { opacity: .95; }
-          50% { transform: translate3d(calc(var(--drift) * .5),-60vh,0) scale(1.05); }
-          85% { opacity: .8; }
-          100% { transform: translate3d(var(--drift),-125vh,0) scale(1.15); opacity: 0; }
+        @media (prefers-reduced-motion: reduce) {
+          [style*="auroraDrift"], [style*="waveSlide"] { animation: none !important; }
         }
       `}</style>
     </div>
   );
 }
+
 
 function SubjectGlyphs({ subject, lang }: { subject: Subject; lang: Lang }) {
   const [mounted, setMounted] = useState(false);
