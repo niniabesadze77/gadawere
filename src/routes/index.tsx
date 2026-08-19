@@ -310,38 +310,23 @@ function Home() {
           </button>
         </div>
 
-        {/* Intro hint + tap-anywhere layer */}
-        {phase === "intro" && (
-          <>
-            <div
-              onClick={advance}
-              className="fixed inset-0 z-10"
-              aria-hidden="true"
-            />
-            <div className="fixed inset-x-0 bottom-16 z-20 text-center">
-              <p className="animate-[breathe_2.6s_ease-in-out_infinite] text-sm font-semibold text-violet-600">
-                {t.tapToStart}
-              </p>
-            </div>
-          </>
-        )}
-
         {phase === "auth" && <RegisterScreen onDone={onRegistered} />}
 
 
         {phase === "signing" && <SigningLoader />}
 
         {showMain && (
-          <main className="relative z-10 mx-auto max-w-3xl px-4 pb-16 pt-24">
+          <main className="relative z-10 mx-auto w-full max-w-3xl px-4 pb-16 pt-24 md:max-w-4xl md:px-8 lg:max-w-5xl xl:max-w-6xl">
             {!selected && account && (
               <div className="mb-8 text-center">
                 <h1
-                  className="animate-[fadeUp_0.8s_cubic-bezier(0.16,1,0.3,1)_both] text-2xl font-black uppercase tracking-tight sm:text-3xl"
+                  className="animate-[fadeUp_0.8s_cubic-bezier(0.16,1,0.3,1)_both] text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl"
                   style={{ animationDelay: "120ms" }}
                 >
                   <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent">
-                    {t.hello}, {account.name}
+                    {t.hello}, {account.phone}
                   </span>
+
                 </h1>
                 <a
                   href="mailto:gadatseresupport@gmail.com"
