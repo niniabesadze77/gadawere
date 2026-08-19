@@ -166,7 +166,7 @@ function Home() {
   const [menu, setMenu] = useState(false);
   const [dark, setDark] = useState(false);
   const [lang, setLang] = useState<Lang>("ka");
-  const [weather, setWeather] = useState<Weather>("snow");
+  const [weather, setWeather] = useState<Weather>("aurora");
 
   const t = (DICT[lang] as unknown) as Dict;
 
