@@ -122,7 +122,7 @@ function TypedBrand({ text, onDone }: { text: string; onDone: () => void }) {
     if (count >= text.length) {
       if (doneRef.current) return;
       doneRef.current = true;
-      const id = setTimeout(onDone, 900);
+      const id = setTimeout(onDone, 380);
       return () => clearTimeout(id);
     }
     const id = setTimeout(
@@ -131,20 +131,28 @@ function TypedBrand({ text, onDone }: { text: string; onDone: () => void }) {
         if (ac && ac.state === "running") playKeyClick(ac);
         setCount((c) => c + 1);
       },
-      count === 0 ? 420 : 115 + Math.random() * 70,
+      count === 0 ? 320 : 95 + Math.random() * 55,
     );
     return () => clearTimeout(id);
   }, [count, text, onDone]);
 
   return (
-    <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-3xl font-black tracking-tight text-transparent">
-      {text.slice(0, count)}
-      <span className="ml-0.5 inline-block w-[2px] animate-[breathe_1s_ease-in-out_infinite] bg-gradient-to-b from-violet-600 to-blue-600 align-middle text-transparent">
-        |
+    <span className="relative inline-flex items-baseline whitespace-nowrap text-3xl font-black tracking-tight sm:text-4xl">
+      {/* invisible sizer keeps the box width stable so nothing shifts while typing */}
+      <span className="invisible" aria-hidden="true">
+        {text}
+      </span>
+      <span className="absolute inset-0 flex items-baseline whitespace-nowrap bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent">
+        {text.slice(0, count)}
+        <span
+          aria-hidden="true"
+          className="ml-[3px] inline-block h-[1em] w-[3px] animate-[breathe_1s_ease-in-out_infinite] self-center rounded-full bg-violet-500"
+        />
       </span>
     </span>
   );
 }
+
 
 /* ---------------- root ---------------- */
 
