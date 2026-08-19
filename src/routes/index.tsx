@@ -57,12 +57,11 @@ const SUBJECTS: { id: Subject; emoji: string; active: boolean }[] = [
 ];
 
 const WEATHERS = [
-  { id: "snow", icon: "❄️" },
-  { id: "rain", icon: "🌧️" },
-  { id: "sun", icon: "☀️" },
-  { id: "cherry", icon: "🌸" },
-  { id: "bubbles", icon: "🫧" },
+  { id: "aurora", icon: "🌌" },
+  { id: "waves", icon: "🌊" },
+  { id: "minimal", icon: "◻️" },
 ] as const;
+
 
 type Weather = (typeof WEATHERS)[number]["id"];
 
