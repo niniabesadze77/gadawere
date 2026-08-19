@@ -80,7 +80,7 @@ const TOOLS: { id: Tool; emoji: string; active: boolean }[] = [
   { id: "soon", emoji: "✨", active: false },
 ];
 
-type Account = { name: string; surname: string; phone: string; pass: string };
+type Account = { phone: string };
 
 /* ---------------- typing logo ---------------- */
 
