@@ -524,18 +524,25 @@ function SlideCard({
         fontFamily: th.font,
         color: th.text,
         aspectRatio: "16 / 9",
+        containerType: "inline-size",
       }}
     >
       <div
-        className="absolute left-0 top-0 h-full w-1.5"
-        style={{ background: th.gradient || th.accent }}
+        className="absolute left-0 top-0 h-full"
+        style={{ width: "0.9cqw", background: th.gradient || th.accent }}
       />
       <div
         className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full opacity-20 blur-3xl"
         style={{ background: th.accent }}
       />
-      <div className="relative flex h-full flex-col p-5 pl-7">
-        <div className="flex items-center gap-2 text-[9px] font-bold uppercase tracking-[0.22em] opacity-55">
+      <div
+        className="relative flex h-full flex-col"
+        style={{ padding: "4.2cqw 4.6cqw 3.4cqw 5.6cqw" }}
+      >
+        <div
+          className="flex items-center gap-2 font-bold uppercase tracking-[0.22em] opacity-55"
+          style={{ fontSize: "1.5cqw" }}
+        >
           <span>
             {t.slide} {index + 1}
           </span>
@@ -546,28 +553,39 @@ function SlideCard({
           contentEditable
           suppressContentEditableWarning
           onBlur={(e) => onChange({ title: e.currentTarget.textContent ?? "" })}
-          className="mt-1 text-lg font-black leading-tight tracking-tight outline-none sm:text-xl"
-          style={{ color: th.accent }}
-        >
-          {slide.title}
-        </h3>
+          className="font-black leading-[1.1] tracking-tight outline-none"
+          style={{ color: th.accent, fontSize: "4.4cqw", marginTop: "1cqw" }}
+        />
         <span
-          className="mt-1.5 block h-[3px] w-10 rounded-full"
-          style={{ background: th.accent, opacity: 0.85 }}
+          className="block rounded-full"
+          style={{
+            background: th.accent,
+            opacity: 0.85,
+            height: "0.45cqw",
+            width: "7cqw",
+            marginTop: "1.4cqw",
+          }}
         />
 
         <div
-          className={`mt-2.5 flex min-h-0 flex-1 gap-3 ${photo ? "" : "flex-col"}`}
+          className={`flex min-h-0 flex-1 ${photo ? "" : "flex-col"}`}
+          style={{ gap: "3cqw", marginTop: "2.4cqw" }}
         >
-          <ul className="min-w-0 flex-1 space-y-1.5 overflow-hidden">
+          <ul className="min-w-0 flex-1 overflow-hidden" style={{ display: "grid", gap: "1.6cqw", alignContent: "start" }}>
             {slide.bullets.map((b, i) => (
               <li
                 key={i}
-                className="flex gap-2 text-[12px] leading-snug sm:text-[13px]"
+                className="flex leading-[1.35]"
+                style={{ fontSize: "2.35cqw", gap: "1.4cqw" }}
               >
                 <span
-                  className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full"
-                  style={{ background: th.accent }}
+                  className="shrink-0 rounded-full"
+                  style={{
+                    background: th.accent,
+                    height: "0.8cqw",
+                    width: "0.8cqw",
+                    marginTop: "0.9cqw",
+                  }}
                 />
                 <span
                   contentEditable
@@ -591,16 +609,19 @@ function SlideCard({
             <img
               src={photo}
               alt=""
-              className="h-full w-[38%] shrink-0 rounded-xl object-cover"
+              className="h-full shrink-0 rounded-xl object-cover"
+              style={{ width: "34%" }}
             />
           )}
         </div>
         {slide.note && (
-          <p className="mt-2 line-clamp-2 text-[10px] italic opacity-55">
+          <p
+            className="line-clamp-2 italic opacity-55"
+            style={{ fontSize: "1.7cqw", marginTop: "2cqw" }}
+          >
             {slide.note}
           </p>
         )}
-
       </div>
     </div>
   );
