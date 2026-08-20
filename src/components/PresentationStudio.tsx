@@ -555,7 +555,9 @@ function SlideCard({
           onBlur={(e) => onChange({ title: e.currentTarget.textContent ?? "" })}
           className="font-black leading-[1.1] tracking-tight outline-none"
           style={{ color: th.accent, fontSize: "4.4cqw", marginTop: "1cqw" }}
-        />
+        >
+          {slide.title}
+        </h3>
         <span
           className="block rounded-full"
           style={{
