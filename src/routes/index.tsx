@@ -466,7 +466,7 @@ function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
     "peer w-full rounded-2xl border border-white/70 bg-white/60 px-4 pb-2.5 pt-6 text-sm font-semibold outline-none backdrop-blur-md transition-all duration-300 focus:border-violet-400 focus:bg-white/85 focus:shadow-[0_10px_30px_-12px_rgba(109,40,217,0.45)]";
 
   const fields = [
-    { v: phone, set: setPhone, ph: t.phone, type: "tel", icon: "📱", d: 0 },
+    { v: phone, set: setPhone, ph: t.phone, type: "text", icon: "👤", d: 0 },
     { v: pass, set: setPass, ph: t.password, type: "password", icon: "🔒", d: 90 },
   ];
 
