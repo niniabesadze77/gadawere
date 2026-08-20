@@ -415,14 +415,15 @@ function Home() {
 
 function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
   const { t } = useT();
-  const [name, setName] = useState("");
-  const [surname, setSurname] = useState("");
+  const [mode, setMode] = useState<"register" | "login">("register");
   const [phone, setPhone] = useState("");
   const [pass, setPass] = useState("");
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  function submit() {
-    if (!name.trim() || !surname.trim() || !phone.trim() || !pass) {
+  async function submit() {
+    if (busy) return;
+    if (!phone.trim() || !pass) {
       setError(t.fillAll);
       return;
     }
@@ -434,23 +435,41 @@ function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
       setError(t.shortPass);
       return;
     }
-    onDone({
-      name: name.trim(),
-      surname: surname.trim(),
-      phone: phone.trim(),
-      pass,
-    });
+    setError(null);
+    setBusy(true);
+    try {
+      const res = await fetch("/api/public/account", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode, phone: phone.trim(), pass }),
+      });
+      const data = (await res.json()) as { ok?: boolean; phone?: string; error?: string };
+      if (!res.ok || !data.ok) {
+        const map: Record<string, string> = {
+          taken: t.phoneTaken,
+          bad_credentials: t.wrongCreds,
+          bad_phone: t.badPhone,
+          short_pass: t.shortPass,
+        };
+        setError(map[data.error ?? ""] ?? t.connErr);
+        return;
+      }
+      onDone({ phone: data.phone ?? phone.trim() });
+    } catch {
+      setError(t.connErr);
+    } finally {
+      setBusy(false);
+    }
   }
 
   const field =
     "peer w-full rounded-2xl border border-white/70 bg-white/60 px-4 pb-2.5 pt-6 text-sm font-semibold outline-none backdrop-blur-md transition-all duration-300 focus:border-violet-400 focus:bg-white/85 focus:shadow-[0_10px_30px_-12px_rgba(109,40,217,0.45)]";
 
   const fields = [
-    { v: name, set: setName, ph: t.name, type: "text", icon: "👤", d: 0 },
-    { v: surname, set: setSurname, ph: t.surname, type: "text", icon: "🪪", d: 90 },
-    { v: phone, set: setPhone, ph: t.phone, type: "tel", icon: "📱", d: 180 },
-    { v: pass, set: setPass, ph: t.password, type: "password", icon: "🔒", d: 270 },
+    { v: phone, set: setPhone, ph: t.phone, type: "tel", icon: "📱", d: 0 },
+    { v: pass, set: setPass, ph: t.password, type: "password", icon: "🔒", d: 90 },
   ];
+
 
   return (
     <div className="relative z-20 mx-auto flex min-h-screen max-w-md items-center px-4 pb-10 pt-28">
@@ -468,12 +487,13 @@ function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
             </div>
             <h2 className="mt-4 text-center text-[1.7rem] font-black leading-tight">
               <span className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-blue-600 bg-clip-text text-transparent">
-                {t.registerTitle}
+                {mode === "register" ? t.registerTitle : t.loginTitle}
               </span>
             </h2>
             <p className="mt-1.5 text-center text-xs font-medium opacity-70">
-              {t.registerSub}
+              {mode === "register" ? t.registerSub : t.loginSub}
             </p>
+
             <div className="mt-4 h-px w-24 bg-gradient-to-r from-transparent via-violet-400/70 to-transparent" />
           </div>
 
@@ -508,11 +528,24 @@ function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
           <button
             type="button"
             onClick={submit}
+            disabled={busy}
             data-on="true"
-            className="mt-6 w-full rounded-2xl px-4 py-3.5 text-sm font-black tracking-wide transition-transform duration-300 hover:-translate-y-0.5"
+            className="mt-6 w-full rounded-2xl px-4 py-3.5 text-sm font-black tracking-wide transition-transform duration-300 hover:-translate-y-0.5 disabled:opacity-60"
           >
-            {t.createAccount} ✨
+            {busy ? "..." : mode === "register" ? `${t.createAccount} ✨` : t.signIn}
           </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setError(null);
+              setMode((m) => (m === "register" ? "login" : "register"));
+            }}
+            className="mt-3 w-full bg-transparent text-center text-xs font-semibold text-violet-600 underline-offset-4 hover:underline"
+          >
+            {mode === "register" ? t.haveAccount : t.noAccount}
+          </button>
+
         </div>
       </div>
     </div>
