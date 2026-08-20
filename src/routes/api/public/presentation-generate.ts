@@ -60,8 +60,8 @@ Return ONLY valid JSON (no markdown fences, no commentary) with this exact shape
   "slides": [
     {
       "title": "slide title",
-      "bullets": ["3 to 4 short punchy phrases"],
-      "note": "one sentence of speaker notes",
+      "bullets": ["5 informative lines, 12-20 words each"],
+      "note": "two sentences of speaker notes",
       "emoji": "single decorative emoji",
       "photo": null
     }
