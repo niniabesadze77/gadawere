@@ -487,12 +487,13 @@ function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
             </div>
             <h2 className="mt-4 text-center text-[1.7rem] font-black leading-tight">
               <span className="bg-gradient-to-r from-violet-600 via-fuchsia-500 to-blue-600 bg-clip-text text-transparent">
-                {t.registerTitle}
+                {mode === "register" ? t.registerTitle : t.loginTitle}
               </span>
             </h2>
             <p className="mt-1.5 text-center text-xs font-medium opacity-70">
-              {t.registerSub}
+              {mode === "register" ? t.registerSub : t.loginSub}
             </p>
+
             <div className="mt-4 h-px w-24 bg-gradient-to-r from-transparent via-violet-400/70 to-transparent" />
           </div>
 
