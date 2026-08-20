@@ -724,65 +724,45 @@ function BackgroundAnim({ effect, dim }: { effect: Weather; dim: boolean }) {
 
   return (
     <div className={wrap}>
+      {/* soft, minimal wash — two slow, very subtle tints */}
       {effect !== "minimal" && (
         <>
           <span
-            className="absolute -left-[18%] -top-[22%] h-[70vmax] w-[70vmax] rounded-full opacity-70 blur-[90px]"
+            className="absolute -left-[15%] -top-[18%] h-[62vmax] w-[62vmax] rounded-full opacity-40 blur-[120px]"
             style={{
               background:
-                "radial-gradient(circle at 40% 40%, rgba(167,139,250,0.55), rgba(167,139,250,0) 70%)",
-              animation: "auroraDrift 26s ease-in-out infinite",
+                "radial-gradient(circle at 50% 50%, rgba(167,139,250,0.35), rgba(167,139,250,0) 70%)",
+              animation: "auroraDrift 42s ease-in-out infinite",
             }}
           />
           <span
-            className="absolute -right-[20%] top-[8%] h-[62vmax] w-[62vmax] rounded-full opacity-70 blur-[90px]"
+            className="absolute -right-[18%] bottom-[-20%] h-[58vmax] w-[58vmax] rounded-full opacity-35 blur-[130px]"
             style={{
               background:
-                "radial-gradient(circle at 55% 45%, rgba(96,165,250,0.5), rgba(96,165,250,0) 70%)",
-              animation: "auroraDrift 32s ease-in-out infinite reverse",
-            }}
-          />
-          <span
-            className="absolute bottom-[-25%] left-[15%] h-[60vmax] w-[60vmax] rounded-full opacity-60 blur-[100px]"
-            style={{
-              background:
-                "radial-gradient(circle at 50% 50%, rgba(244,182,255,0.45), rgba(244,182,255,0) 70%)",
-              animation: "auroraDrift 38s ease-in-out infinite",
-              animationDelay: "-8s",
+                "radial-gradient(circle at 50% 50%, rgba(96,165,250,0.32), rgba(96,165,250,0) 70%)",
+              animation: "auroraDrift 54s ease-in-out infinite reverse",
             }}
           />
         </>
       )}
 
       {effect === "waves" && (
-        <svg
-          className="absolute inset-x-0 bottom-0 h-[46vh] w-full opacity-[0.5]"
-          viewBox="0 0 1440 420"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-        >
-          {[
-            { fill: "rgba(139,92,246,0.20)", dur: "18s", y: 0 },
-            { fill: "rgba(59,130,246,0.18)", dur: "24s", y: 40 },
-            { fill: "rgba(216,180,254,0.20)", dur: "31s", y: 80 },
-          ].map((w, i) => (
-            <g key={i} style={{ animation: `waveSlide ${w.dur} linear infinite` }}>
-              <path
-                transform={`translate(0 ${w.y})`}
-                fill={w.fill}
-                d="M0,180 C240,120 480,240 720,180 C960,120 1200,240 1440,180 L1440,420 L0,420 Z"
-              />
-              <path
-                transform={`translate(1440 ${w.y})`}
-                fill={w.fill}
-                d="M0,180 C240,120 480,240 720,180 C960,120 1200,240 1440,180 L1440,420 L0,420 Z"
-              />
-            </g>
-          ))}
-        </svg>
+        <div
+          className="absolute inset-0 opacity-[0.35]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgba(99,102,241,0.10) 1px, transparent 1px), linear-gradient(to bottom, rgba(99,102,241,0.10) 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+            maskImage:
+              "radial-gradient(ellipse at 50% 30%, black 30%, transparent 75%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse at 50% 30%, black 30%, transparent 75%)",
+          }}
+        />
       )}
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.55),transparent_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.6),transparent_65%)]" />
+
 
       <style>{`
         @keyframes auroraDrift {
