@@ -528,11 +528,24 @@ function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
           <button
             type="button"
             onClick={submit}
+            disabled={busy}
             data-on="true"
-            className="mt-6 w-full rounded-2xl px-4 py-3.5 text-sm font-black tracking-wide transition-transform duration-300 hover:-translate-y-0.5"
+            className="mt-6 w-full rounded-2xl px-4 py-3.5 text-sm font-black tracking-wide transition-transform duration-300 hover:-translate-y-0.5 disabled:opacity-60"
           >
-            {t.createAccount} ✨
+            {busy ? "..." : mode === "register" ? `${t.createAccount} ✨` : t.signIn}
           </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setError(null);
+              setMode((m) => (m === "register" ? "login" : "register"));
+            }}
+            className="mt-3 w-full bg-transparent text-center text-xs font-semibold text-violet-600 underline-offset-4 hover:underline"
+          >
+            {mode === "register" ? t.haveAccount : t.noAccount}
+          </button>
+
         </div>
       </div>
     </div>
