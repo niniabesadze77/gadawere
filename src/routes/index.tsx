@@ -427,7 +427,7 @@ function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
       setError(t.fillAll);
       return;
     }
-    if (phone.replace(/\D/g, "").length < 6) {
+    if (phone.trim().length < 3) {
       setError(t.badPhone);
       return;
     }
