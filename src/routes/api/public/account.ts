@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 type Body = { mode: "register" | "login"; phone: string; pass: string };
 
 function normalizePhone(raw: string) {
-  return raw.replace(/[^\d+]/g, "");
+  return raw.trim().toLowerCase().replace(/\s+/g, "");
 }
 
 async function hash(phone: string, pass: string) {
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/api/public/account")({
         const phone = normalizePhone(String(body.phone ?? ""));
         const pass = String(body.pass ?? "");
 
-        if (phone.replace(/\D/g, "").length < 6) return json({ error: "bad_phone" }, 400);
+        if (phone.length < 3) return json({ error: "bad_phone" }, 400);
         if (pass.length < 4) return json({ error: "short_pass" }, 400);
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
