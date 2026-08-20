@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 type Body = { mode: "register" | "login"; phone: string; pass: string };
 
 function normalizePhone(raw: string) {
-  return raw.replace(/[^\d+]/g, "");
+  return raw.trim().toLowerCase().replace(/\s+/g, "");
 }
 
 async function hash(phone: string, pass: string) {
