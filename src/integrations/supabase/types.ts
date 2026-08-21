@@ -14,6 +14,21 @@ export type Database = {
   }
   public: {
     Tables: {
+      admins: {
+        Row: {
+          created_at: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
       app_users: {
         Row: {
           created_at: string
@@ -32,6 +47,93 @@ export type Database = {
           id?: string
           pass_hash?: string
           phone?: string
+        }
+        Relationships: []
+      }
+      flags: {
+        Row: {
+          created_at: string
+          id: string
+          text: string
+          username: string
+          word: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          text: string
+          username: string
+          word: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          text?: string
+          username?: string
+          word?: string
+        }
+        Relationships: []
+      }
+      presence: {
+        Row: {
+          first_seen: string
+          last_seen: string
+          username: string
+        }
+        Insert: {
+          first_seen?: string
+          last_seen?: string
+          username: string
+        }
+        Update: {
+          first_seen?: string
+          last_seen?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      strikes: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string
+          until: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason?: string
+          until: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string
+          until?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      visits: {
+        Row: {
+          created_at: string
+          day: string
+          id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          day?: string
+          id?: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          day?: string
+          id?: string
+          username?: string
         }
         Relationships: []
       }
