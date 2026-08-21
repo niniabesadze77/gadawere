@@ -18,6 +18,7 @@ import { Route as ApiPublicModerateRouteImport } from './routes/api/public/moder
 import { Route as ApiPublicMathChatRouteImport } from './routes/api/public/math-chat'
 import { Route as ApiPublicImproveEssayRouteImport } from './routes/api/public/improve-essay'
 import { Route as ApiPublicEssayGenerateRouteImport } from './routes/api/public/essay-generate'
+import { Route as ApiPublicAdminRouteImport } from './routes/api/public/admin'
 import { Route as ApiPublicAccountRouteImport } from './routes/api/public/account'
 
 const IndexRoute = IndexRouteImport.update({
@@ -67,6 +68,11 @@ const ApiPublicEssayGenerateRoute = ApiPublicEssayGenerateRouteImport.update({
   path: '/api/public/essay-generate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAdminRoute = ApiPublicAdminRouteImport.update({
+  id: '/api/public/admin',
+  path: '/api/public/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicAccountRoute = ApiPublicAccountRouteImport.update({
   id: '/api/public/account',
   path: '/api/public/account',
@@ -76,6 +82,7 @@ const ApiPublicAccountRoute = ApiPublicAccountRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/public/account': typeof ApiPublicAccountRoute
+  '/api/public/admin': typeof ApiPublicAdminRoute
   '/api/public/essay-generate': typeof ApiPublicEssayGenerateRoute
   '/api/public/improve-essay': typeof ApiPublicImproveEssayRoute
   '/api/public/math-chat': typeof ApiPublicMathChatRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/public/account': typeof ApiPublicAccountRoute
+  '/api/public/admin': typeof ApiPublicAdminRoute
   '/api/public/essay-generate': typeof ApiPublicEssayGenerateRoute
   '/api/public/improve-essay': typeof ApiPublicImproveEssayRoute
   '/api/public/math-chat': typeof ApiPublicMathChatRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api/public/account': typeof ApiPublicAccountRoute
+  '/api/public/admin': typeof ApiPublicAdminRoute
   '/api/public/essay-generate': typeof ApiPublicEssayGenerateRoute
   '/api/public/improve-essay': typeof ApiPublicImproveEssayRoute
   '/api/public/math-chat': typeof ApiPublicMathChatRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/api/public/account'
+    | '/api/public/admin'
     | '/api/public/essay-generate'
     | '/api/public/improve-essay'
     | '/api/public/math-chat'
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/api/public/account'
+    | '/api/public/admin'
     | '/api/public/essay-generate'
     | '/api/public/improve-essay'
     | '/api/public/math-chat'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/api/public/account'
+    | '/api/public/admin'
     | '/api/public/essay-generate'
     | '/api/public/improve-essay'
     | '/api/public/math-chat'
@@ -152,6 +164,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiPublicAccountRoute: typeof ApiPublicAccountRoute
+  ApiPublicAdminRoute: typeof ApiPublicAdminRoute
   ApiPublicEssayGenerateRoute: typeof ApiPublicEssayGenerateRoute
   ApiPublicImproveEssayRoute: typeof ApiPublicImproveEssayRoute
   ApiPublicMathChatRoute: typeof ApiPublicMathChatRoute
@@ -227,6 +240,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicEssayGenerateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/admin': {
+      id: '/api/public/admin'
+      path: '/api/public/admin'
+      fullPath: '/api/public/admin'
+      preLoaderRoute: typeof ApiPublicAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/account': {
       id: '/api/public/account'
       path: '/api/public/account'
@@ -240,6 +260,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiPublicAccountRoute: ApiPublicAccountRoute,
+  ApiPublicAdminRoute: ApiPublicAdminRoute,
   ApiPublicEssayGenerateRoute: ApiPublicEssayGenerateRoute,
   ApiPublicImproveEssayRoute: ApiPublicImproveEssayRoute,
   ApiPublicMathChatRoute: ApiPublicMathChatRoute,
