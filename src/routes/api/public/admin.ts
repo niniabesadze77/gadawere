@@ -3,9 +3,11 @@ import { createFileRoute } from "@tanstack/react-router";
 type Body = {
   username?: string;
   pass?: string;
-  action?: "stats" | "unban" | "ban";
+  action?: "stats" | "unban" | "ban" | "approve" | "reject";
   target?: string;
+  subId?: string;
 };
+
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {

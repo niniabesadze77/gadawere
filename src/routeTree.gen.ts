@@ -10,7 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicTutorChatRouteImport } from './routes/api/public/tutor-chat'
+import { Route as ApiPublicSubscribeRouteImport } from './routes/api/public/subscribe'
 import { Route as ApiPublicSolveMathRouteImport } from './routes/api/public/solve-math'
+import { Route as ApiPublicScoresRouteImport } from './routes/api/public/scores'
+import { Route as ApiPublicScheduleRouteImport } from './routes/api/public/schedule'
 import { Route as ApiPublicPresentationGenerateRouteImport } from './routes/api/public/presentation-generate'
 import { Route as ApiPublicPresenceRouteImport } from './routes/api/public/presence'
 import { Route as ApiPublicPracticeGenerateRouteImport } from './routes/api/public/practice-generate'
@@ -26,9 +30,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicTutorChatRoute = ApiPublicTutorChatRouteImport.update({
+  id: '/api/public/tutor-chat',
+  path: '/api/public/tutor-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSubscribeRoute = ApiPublicSubscribeRouteImport.update({
+  id: '/api/public/subscribe',
+  path: '/api/public/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSolveMathRoute = ApiPublicSolveMathRouteImport.update({
   id: '/api/public/solve-math',
   path: '/api/public/solve-math',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicScoresRoute = ApiPublicScoresRouteImport.update({
+  id: '/api/public/scores',
+  path: '/api/public/scores',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicScheduleRoute = ApiPublicScheduleRouteImport.update({
+  id: '/api/public/schedule',
+  path: '/api/public/schedule',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicPresentationGenerateRoute =
@@ -90,7 +114,11 @@ export interface FileRoutesByFullPath {
   '/api/public/practice-generate': typeof ApiPublicPracticeGenerateRoute
   '/api/public/presence': typeof ApiPublicPresenceRoute
   '/api/public/presentation-generate': typeof ApiPublicPresentationGenerateRoute
+  '/api/public/schedule': typeof ApiPublicScheduleRoute
+  '/api/public/scores': typeof ApiPublicScoresRoute
   '/api/public/solve-math': typeof ApiPublicSolveMathRoute
+  '/api/public/subscribe': typeof ApiPublicSubscribeRoute
+  '/api/public/tutor-chat': typeof ApiPublicTutorChatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -103,7 +131,11 @@ export interface FileRoutesByTo {
   '/api/public/practice-generate': typeof ApiPublicPracticeGenerateRoute
   '/api/public/presence': typeof ApiPublicPresenceRoute
   '/api/public/presentation-generate': typeof ApiPublicPresentationGenerateRoute
+  '/api/public/schedule': typeof ApiPublicScheduleRoute
+  '/api/public/scores': typeof ApiPublicScoresRoute
   '/api/public/solve-math': typeof ApiPublicSolveMathRoute
+  '/api/public/subscribe': typeof ApiPublicSubscribeRoute
+  '/api/public/tutor-chat': typeof ApiPublicTutorChatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -117,7 +149,11 @@ export interface FileRoutesById {
   '/api/public/practice-generate': typeof ApiPublicPracticeGenerateRoute
   '/api/public/presence': typeof ApiPublicPresenceRoute
   '/api/public/presentation-generate': typeof ApiPublicPresentationGenerateRoute
+  '/api/public/schedule': typeof ApiPublicScheduleRoute
+  '/api/public/scores': typeof ApiPublicScoresRoute
   '/api/public/solve-math': typeof ApiPublicSolveMathRoute
+  '/api/public/subscribe': typeof ApiPublicSubscribeRoute
+  '/api/public/tutor-chat': typeof ApiPublicTutorChatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -132,7 +168,11 @@ export interface FileRouteTypes {
     | '/api/public/practice-generate'
     | '/api/public/presence'
     | '/api/public/presentation-generate'
+    | '/api/public/schedule'
+    | '/api/public/scores'
     | '/api/public/solve-math'
+    | '/api/public/subscribe'
+    | '/api/public/tutor-chat'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -145,7 +185,11 @@ export interface FileRouteTypes {
     | '/api/public/practice-generate'
     | '/api/public/presence'
     | '/api/public/presentation-generate'
+    | '/api/public/schedule'
+    | '/api/public/scores'
     | '/api/public/solve-math'
+    | '/api/public/subscribe'
+    | '/api/public/tutor-chat'
   id:
     | '__root__'
     | '/'
@@ -158,7 +202,11 @@ export interface FileRouteTypes {
     | '/api/public/practice-generate'
     | '/api/public/presence'
     | '/api/public/presentation-generate'
+    | '/api/public/schedule'
+    | '/api/public/scores'
     | '/api/public/solve-math'
+    | '/api/public/subscribe'
+    | '/api/public/tutor-chat'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -172,7 +220,11 @@ export interface RootRouteChildren {
   ApiPublicPracticeGenerateRoute: typeof ApiPublicPracticeGenerateRoute
   ApiPublicPresenceRoute: typeof ApiPublicPresenceRoute
   ApiPublicPresentationGenerateRoute: typeof ApiPublicPresentationGenerateRoute
+  ApiPublicScheduleRoute: typeof ApiPublicScheduleRoute
+  ApiPublicScoresRoute: typeof ApiPublicScoresRoute
   ApiPublicSolveMathRoute: typeof ApiPublicSolveMathRoute
+  ApiPublicSubscribeRoute: typeof ApiPublicSubscribeRoute
+  ApiPublicTutorChatRoute: typeof ApiPublicTutorChatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -184,11 +236,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/tutor-chat': {
+      id: '/api/public/tutor-chat'
+      path: '/api/public/tutor-chat'
+      fullPath: '/api/public/tutor-chat'
+      preLoaderRoute: typeof ApiPublicTutorChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/subscribe': {
+      id: '/api/public/subscribe'
+      path: '/api/public/subscribe'
+      fullPath: '/api/public/subscribe'
+      preLoaderRoute: typeof ApiPublicSubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/solve-math': {
       id: '/api/public/solve-math'
       path: '/api/public/solve-math'
       fullPath: '/api/public/solve-math'
       preLoaderRoute: typeof ApiPublicSolveMathRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/scores': {
+      id: '/api/public/scores'
+      path: '/api/public/scores'
+      fullPath: '/api/public/scores'
+      preLoaderRoute: typeof ApiPublicScoresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/schedule': {
+      id: '/api/public/schedule'
+      path: '/api/public/schedule'
+      fullPath: '/api/public/schedule'
+      preLoaderRoute: typeof ApiPublicScheduleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/presentation-generate': {
@@ -268,7 +348,11 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicPracticeGenerateRoute: ApiPublicPracticeGenerateRoute,
   ApiPublicPresenceRoute: ApiPublicPresenceRoute,
   ApiPublicPresentationGenerateRoute: ApiPublicPresentationGenerateRoute,
+  ApiPublicScheduleRoute: ApiPublicScheduleRoute,
+  ApiPublicScoresRoute: ApiPublicScoresRoute,
   ApiPublicSolveMathRoute: ApiPublicSolveMathRoute,
+  ApiPublicSubscribeRoute: ApiPublicSubscribeRoute,
+  ApiPublicTutorChatRoute: ApiPublicTutorChatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
