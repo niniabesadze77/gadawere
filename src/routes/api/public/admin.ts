@@ -3,9 +3,11 @@ import { createFileRoute } from "@tanstack/react-router";
 type Body = {
   username?: string;
   pass?: string;
-  action?: "stats" | "unban" | "ban";
+  action?: "stats" | "unban" | "ban" | "approve" | "reject";
   target?: string;
+  subId?: string;
 };
+
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -73,9 +75,35 @@ export const Route = createFileRoute("/api/public/admin")({
           });
         }
 
+        if (action === "approve" && body.subId) {
+          const { data: sub } = await supabaseAdmin
+            .from("subscriptions")
+            .select("id, plan")
+            .eq("id", body.subId)
+            .maybeSingle();
+          if (sub) {
+            const days = sub.plan === "premium" ? 365 : 30;
+            await supabaseAdmin
+              .from("subscriptions")
+              .update({
+                status: "active",
+                expires_at: new Date(now.getTime() + days * 86400000).toISOString(),
+              })
+              .eq("id", sub.id);
+          }
+        }
+
+        if (action === "reject" && body.subId) {
+          await supabaseAdmin
+            .from("subscriptions")
+            .update({ status: "rejected" })
+            .eq("id", body.subId);
+        }
+
         const online = new Date(now.getTime() - 2 * 60 * 1000).toISOString();
 
-        const [flags, strikes, onlineRes, todayRes, totalUsers] = await Promise.all([
+        const [flags, strikes, onlineRes, todayRes, totalUsers, subs] = await Promise.all([
+
           supabaseAdmin
             .from("flags")
             .select("id, username, text, word, created_at")

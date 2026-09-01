@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.15"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -92,6 +92,66 @@ export type Database = {
         }
         Relationships: []
       }
+      schedule: {
+        Row: {
+          created_at: string
+          id: string
+          note: string
+          start_time: string
+          subject: string
+          updated_at: string
+          username: string
+          weekday: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string
+          start_time?: string
+          subject: string
+          updated_at?: string
+          username: string
+          weekday: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string
+          start_time?: string
+          subject?: string
+          updated_at?: string
+          username?: string
+          weekday?: number
+        }
+        Relationships: []
+      }
+      scores: {
+        Row: {
+          correct: number
+          created_at: string
+          id: string
+          subject: string
+          total: number
+          username: string
+        }
+        Insert: {
+          correct?: number
+          created_at?: string
+          id?: string
+          subject?: string
+          total?: number
+          username: string
+        }
+        Update: {
+          correct?: number
+          created_at?: string
+          id?: string
+          subject?: string
+          total?: number
+          username?: string
+        }
+        Relationships: []
+      }
       strikes: {
         Row: {
           created_at: string
@@ -112,6 +172,39 @@ export type Database = {
           id?: string
           reason?: string
           until?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          payment_code: string
+          plan: string
+          status: string
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          payment_code?: string
+          plan?: string
+          status?: string
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          payment_code?: string
+          plan?: string
+          status?: string
+          updated_at?: string
           username?: string
         }
         Relationships: []
