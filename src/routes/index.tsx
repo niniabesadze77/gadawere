@@ -21,6 +21,20 @@ import {
 } from "@/lib/ui";
 import { EssayStudio } from "@/components/EssayStudio";
 import { PresentationStudio } from "@/components/PresentationStudio";
+import Leaderboard from "@/components/Leaderboard";
+import SchedulePlanner from "@/components/SchedulePlanner";
+import VoiceTutor from "@/components/VoiceTutor";
+import ProPlans from "@/components/ProPlans";
+import AdminPanel from "@/components/AdminPanel";
+import { installModeration, pingPresence, onBlockChange, getBlockedUntil } from "@/lib/moderation";
+import { reportScore } from "@/lib/account";
+import {
+  disableNotifications,
+  enableNotifications,
+  notifyEnabled,
+  startDailyReminder,
+} from "@/lib/notify";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
