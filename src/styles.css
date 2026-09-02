@@ -390,3 +390,25 @@ body button.gw-answer[data-state="reveal"] {
 .dark .gw-root .prose * { color: #eceaff; }
 .dark .gw-root .katex { color: #eceaff; }
 .dark .gw-root [class*="text-slate-6"] { color: #b9bce0; }
+
+/* form inputs + primary action button (shared by the newer studios) */
+.gw-input {
+  width: 100%;
+  border: 1px solid rgba(196,181,253,0.7);
+  background: rgba(255,255,255,0.72);
+  outline: none;
+  transition: all 0.3s ease;
+}
+.gw-input:focus {
+  border-color: rgb(167,139,250);
+  box-shadow: 0 12px 34px -18px rgba(109,40,217,0.55);
+}
+.dark .gw-input {
+  border-color: rgba(139,92,246,0.35);
+  background: rgba(30,27,55,0.6);
+  color: #e9e6ff;
+}
+.gw-btn {
+  background-image: linear-gradient(90deg, #7c3aed, #2563eb);
+  color: #fff;
+}
