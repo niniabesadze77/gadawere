@@ -113,7 +113,13 @@ export const DICT = {
     tools: {
       essay: { label: "ესსეის დაწერა", desc: "AI დაწერს შენს ესსეს" },
       presentation: { label: "პრეზენტაცია", desc: "სლაიდები + ფოტოები" },
+      tutor: { label: "AI ტუტორი", desc: "ხმოვანი საუბარი ქართულად" },
+      leaderboard: { label: "ლიდერბორდი", desc: "ვინ არის საუკეთესო" },
+      schedule: { label: "განრიგი", desc: "შენი გაკვეთილები" },
+      pro: { label: "Basic / Premium", desc: "AI ვიდეო და პრო ფუნქციები" },
+      admin: { label: "ადმინი", desc: "მხოლოდ ადმინებისთვის" },
       soon: { label: "მალე", desc: "ახალი ხელსაწყო გზაშია" },
+
     },
     essayStudio: "ესსეის სტუდია",
     essayBubble: "აღწერე შენი თემა",
@@ -337,7 +343,13 @@ export const DICT = {
     tools: {
       essay: { label: "Write an essay", desc: "AI writes your essay" },
       presentation: { label: "Presentation", desc: "Slides + photos" },
+      tutor: { label: "AI tutor", desc: "Live voice conversation" },
+      leaderboard: { label: "Leaderboard", desc: "See who is on top" },
+      schedule: { label: "Schedule", desc: "Your lessons" },
+      pro: { label: "Basic / Premium", desc: "AI video and pro features" },
+      admin: { label: "Admin", desc: "Admins only" },
       soon: { label: "Coming soon", desc: "A new tool is on the way" },
+
     },
     essayStudio: "Essay studio",
     essayBubble: "Describe your topic",
