@@ -21,6 +21,20 @@ import {
 } from "@/lib/ui";
 import { EssayStudio } from "@/components/EssayStudio";
 import { PresentationStudio } from "@/components/PresentationStudio";
+import Leaderboard from "@/components/Leaderboard";
+import SchedulePlanner from "@/components/SchedulePlanner";
+import VoiceTutor from "@/components/VoiceTutor";
+import ProPlans from "@/components/ProPlans";
+import AdminPanel from "@/components/AdminPanel";
+import { installModeration, pingPresence, onBlockChange, getBlockedUntil } from "@/lib/moderation";
+import { reportScore } from "@/lib/account";
+import {
+  disableNotifications,
+  enableNotifications,
+  notifyEnabled,
+  startDailyReminder,
+} from "@/lib/notify";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -72,13 +86,25 @@ const MATH_SYMBOLS = [
   "%", "x²", "a/b", "∠", "Ω",
 ];
 
-type Tool = "essay" | "presentation" | "soon";
+type Tool =
+  | "essay"
+  | "presentation"
+  | "tutor"
+  | "leaderboard"
+  | "schedule"
+  | "pro"
+  | "admin";
 
 const TOOLS: { id: Tool; emoji: string; active: boolean }[] = [
   { id: "essay", emoji: "📝", active: true },
   { id: "presentation", emoji: "🖼️", active: true },
-  { id: "soon", emoji: "✨", active: false },
+  { id: "tutor", emoji: "🎙️", active: true },
+  { id: "leaderboard", emoji: "🏆", active: true },
+  { id: "schedule", emoji: "🗓️", active: true },
+  { id: "pro", emoji: "💎", active: true },
+  { id: "admin", emoji: "🛡️", active: true },
 ];
+
 
 type Account = { phone: string };
 

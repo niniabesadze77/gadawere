@@ -124,16 +124,23 @@ export const Route = createFileRoute("/api/public/admin")({
             .select("id", { count: "exact", head: true })
             .eq("day", nowIso.slice(0, 10)),
           supabaseAdmin.from("app_users").select("id", { count: "exact", head: true }),
+          supabaseAdmin
+            .from("subscriptions")
+            .select("id, username, plan, status, payment_code, expires_at, created_at")
+            .order("created_at", { ascending: false })
+            .limit(50),
         ]);
 
         return json({
           ok: true,
           flags: flags.data ?? [],
           strikes: strikes.data ?? [],
+          subs: subs.data ?? [],
           online: onlineRes.count ?? 0,
           today: todayRes.count ?? 0,
           users: totalUsers.count ?? 0,
         });
+
       },
     },
   },
