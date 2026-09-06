@@ -2078,10 +2078,14 @@ function Quiz({
   const isLast = idx >= questions.length - 1;
 
   function next(correct: boolean) {
-    if (correct) setScore((s) => s + 1);
-    if (isLast) onFinish();
-    else setIdx((i) => i + 1);
+    const total = score + (correct ? 1 : 0);
+    if (correct) setScore(total);
+    if (isLast) {
+      void reportScore(subject, total, questions.length);
+      onFinish();
+    } else setIdx((i) => i + 1);
   }
+
 
   return (
     <div className="animate-[fadeUp_0.4s_ease-out_both]" key={idx}>
