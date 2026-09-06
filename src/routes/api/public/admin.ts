@@ -37,24 +37,31 @@ export const Route = createFileRoute("/api/public/admin")({
         const pass = String(body.pass ?? "");
         const action = body.action ?? "stats";
 
-        if (!username || !pass) return json({ error: "unauthorized" }, 401);
+        if (!pass) return json({ error: "unauthorized" }, 401);
+
+        const panelPass = process.env["ADMIN_PANEL_PASSWORD"] ?? "";
+        const master = panelPass.length > 0 && pass === panelPass;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-        const { data: admin } = await supabaseAdmin
-          .from("admins")
-          .select("username")
-          .eq("username", username)
-          .maybeSingle();
-        if (!admin) return json({ error: "unauthorized" }, 401);
+        if (!master) {
+          if (!username) return json({ error: "unauthorized" }, 401);
 
-        const { data: user } = await supabaseAdmin
-          .from("app_users")
-          .select("pass_hash")
-          .eq("phone", username)
-          .maybeSingle();
-        if (!user || user.pass_hash !== (await hash(username, pass)))
-          return json({ error: "unauthorized" }, 401);
+          const { data: admin } = await supabaseAdmin
+            .from("admins")
+            .select("username")
+            .eq("username", username)
+            .maybeSingle();
+          if (!admin) return json({ error: "unauthorized" }, 401);
+
+          const { data: user } = await supabaseAdmin
+            .from("app_users")
+            .select("pass_hash")
+            .eq("phone", username)
+            .maybeSingle();
+          if (!user || user.pass_hash !== (await hash(username, pass)))
+            return json({ error: "unauthorized" }, 401);
+        }
 
         const now = new Date();
         const nowIso = now.toISOString();
