@@ -224,6 +224,26 @@ function Home() {
     localStorage.setItem("gw-theme", dark ? "dark" : "light");
   }, [dark]);
 
+  /* moderation gate + presence heartbeat + evening reminder */
+  const [blockedUntil, setBlocked] = useState<number | null>(null);
+
+  useEffect(() => {
+    installModeration();
+    setBlocked(getBlockedUntil());
+    return onBlockChange(setBlocked);
+  }, []);
+
+  useEffect(() => {
+    const user = account?.phone;
+    if (!user) return;
+    void pingPresence(user);
+    const id = window.setInterval(() => void pingPresence(user), 60_000);
+    return () => window.clearInterval(id);
+  }, [account?.phone]);
+
+  useEffect(() => startDailyReminder(t.notifyMsg), [t.notifyMsg]);
+
+
   function advance() {
     if (phase === "intro") setPhase(account ? "ready" : "auth");
   }
