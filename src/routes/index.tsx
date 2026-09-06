@@ -1064,8 +1064,22 @@ function ToolPicker({ onPick }: { onPick: (s: Tool) => void }) {
   );
 }
 
-function ToolView({ tool, onBack }: { tool: Tool; onBack: () => void }) {
+function ToolView({
+  tool,
+  username,
+  onBack,
+}: {
+  tool: Tool;
+  username: string;
+  onBack: () => void;
+}) {
   const { t } = useT();
+  const title =
+    tool === "essay"
+      ? t.essayStudio
+      : tool === "presentation"
+        ? t.presStudio
+        : t.tools[tool].label;
   return (
     <div className="animate-[sheetUp_0.7s_cubic-bezier(0.16,1,0.3,1)_both]">
       <button
@@ -1077,18 +1091,24 @@ function ToolView({ tool, onBack }: { tool: Tool; onBack: () => void }) {
       </button>
       <h2 className="mb-4 text-2xl font-black">
         <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent">
-          {tool === "essay" ? t.essayStudio : t.presStudio}
+          {title}
         </span>
       </h2>
       <Panel>
         <div key={tool} className="animate-[fadeIn_0.45s_ease-out_both]">
           {tool === "essay" && <EssayStudio />}
           {tool === "presentation" && <PresentationStudio />}
+          {tool === "tutor" && <VoiceTutor />}
+          {tool === "leaderboard" && <Leaderboard username={username} />}
+          {tool === "schedule" && <SchedulePlanner username={username} />}
+          {tool === "pro" && <ProPlans username={username} />}
+          {tool === "admin" && <AdminPanel username={username} />}
         </div>
       </Panel>
     </div>
   );
 }
+
 
 /* ---------------- subjects ---------------- */
 
