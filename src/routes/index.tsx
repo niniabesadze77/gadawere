@@ -230,8 +230,12 @@ function Home() {
   useEffect(() => {
     installModeration();
     setBlocked(getBlockedUntil());
-    return onBlockChange(setBlocked);
+    const off = onBlockChange(setBlocked);
+    return () => {
+      off();
+    };
   }, []);
+
 
   useEffect(() => {
     const user = account?.phone;
