@@ -385,13 +385,27 @@ function Home() {
               </div>
             )}
 
+            {blockedUntil && (
+              <div className="gw-note gw-note-bad mb-4 animate-[fadeUp_0.5s_ease-out_both] text-sm">
+                <div className="font-black">🚫 {t.blockedTitle}</div>
+                <div>
+                  {t.blockedText} ({new Date(blockedUntil).toLocaleTimeString()})
+                </div>
+              </div>
+            )}
+
             <div className="animate-[fadeUp_0.9s_cubic-bezier(0.16,1,0.3,1)_both]">
               {!selected ? (
                 <ToolPicker onPick={(s) => setSelected(s)} />
               ) : (
-                <ToolView tool={selected} onBack={() => setSelected(null)} />
+                <ToolView
+                  tool={selected}
+                  username={account?.phone ?? ""}
+                  onBack={() => setSelected(null)}
+                />
               )}
             </div>
+
 
             {!selected && (
               <>
