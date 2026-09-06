@@ -224,6 +224,30 @@ function Home() {
     localStorage.setItem("gw-theme", dark ? "dark" : "light");
   }, [dark]);
 
+  /* moderation gate + presence heartbeat + evening reminder */
+  const [blockedUntil, setBlocked] = useState<number | null>(null);
+
+  useEffect(() => {
+    installModeration();
+    setBlocked(getBlockedUntil());
+    const off = onBlockChange(setBlocked);
+    return () => {
+      off();
+    };
+  }, []);
+
+
+  useEffect(() => {
+    const user = account?.phone;
+    if (!user) return;
+    void pingPresence(user);
+    const id = window.setInterval(() => void pingPresence(user), 60_000);
+    return () => window.clearInterval(id);
+  }, [account?.phone]);
+
+  useEffect(() => startDailyReminder(t.notifyMsg), [t.notifyMsg]);
+
+
   function advance() {
     if (phase === "intro") setPhase(account ? "ready" : "auth");
   }
@@ -365,13 +389,27 @@ function Home() {
               </div>
             )}
 
+            {blockedUntil && (
+              <div className="gw-note gw-note-bad mb-4 animate-[fadeUp_0.5s_ease-out_both] text-sm">
+                <div className="font-black">🚫 {t.blockedTitle}</div>
+                <div>
+                  {t.blockedText} ({new Date(blockedUntil).toLocaleTimeString()})
+                </div>
+              </div>
+            )}
+
             <div className="animate-[fadeUp_0.9s_cubic-bezier(0.16,1,0.3,1)_both]">
               {!selected ? (
                 <ToolPicker onPick={(s) => setSelected(s)} />
               ) : (
-                <ToolView tool={selected} onBack={() => setSelected(null)} />
+                <ToolView
+                  tool={selected}
+                  username={account?.phone ?? ""}
+                  onBack={() => setSelected(null)}
+                />
               )}
             </div>
+
 
             {!selected && (
               <>
@@ -599,7 +637,33 @@ function SigningLoader() {
 
 /* ---------------- settings ---------------- */
 
+function NotifyToggle() {
+  const { t } = useT();
+  const [on, setOn] = useState(false);
+
+  useEffect(() => setOn(notifyEnabled()), []);
+
+  return (
+    <button
+      type="button"
+      data-on={on}
+      onClick={async () => {
+        if (on) {
+          disableNotifications();
+          setOn(false);
+        } else {
+          setOn(await enableNotifications());
+        }
+      }}
+      className="gw-opt w-full rounded-2xl px-3 py-2.5 text-sm font-bold"
+    >
+      {on ? `🔔 ${t.notifyOff}` : `🔕 ${t.notifyOn}`}
+    </button>
+  );
+}
+
 function SettingsMenu({
+
   open,
   setOpen,
   dark,
@@ -689,6 +753,15 @@ function SettingsMenu({
             🇬🇧 English
           </button>
         </div>
+
+        <p className="mt-5 text-xs font-black uppercase tracking-wider text-violet-500">
+          {t.notifyTitle}
+        </p>
+        <div className="mt-2">
+          <NotifyToggle />
+        </div>
+
+
 
         <p className="mt-5 text-xs font-black uppercase tracking-wider text-violet-500">
           {t.theme}
@@ -1064,8 +1137,22 @@ function ToolPicker({ onPick }: { onPick: (s: Tool) => void }) {
   );
 }
 
-function ToolView({ tool, onBack }: { tool: Tool; onBack: () => void }) {
+function ToolView({
+  tool,
+  username,
+  onBack,
+}: {
+  tool: Tool;
+  username: string;
+  onBack: () => void;
+}) {
   const { t } = useT();
+  const title =
+    tool === "essay"
+      ? t.essayStudio
+      : tool === "presentation"
+        ? t.presStudio
+        : t.tools[tool].label;
   return (
     <div className="animate-[sheetUp_0.7s_cubic-bezier(0.16,1,0.3,1)_both]">
       <button
@@ -1077,18 +1164,24 @@ function ToolView({ tool, onBack }: { tool: Tool; onBack: () => void }) {
       </button>
       <h2 className="mb-4 text-2xl font-black">
         <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent">
-          {tool === "essay" ? t.essayStudio : t.presStudio}
+          {title}
         </span>
       </h2>
       <Panel>
         <div key={tool} className="animate-[fadeIn_0.45s_ease-out_both]">
           {tool === "essay" && <EssayStudio />}
           {tool === "presentation" && <PresentationStudio />}
+          {tool === "tutor" && <VoiceTutor />}
+          {tool === "leaderboard" && <Leaderboard username={username} />}
+          {tool === "schedule" && <SchedulePlanner username={username} />}
+          {tool === "pro" && <ProPlans username={username} />}
+          {tool === "admin" && <AdminPanel username={username} />}
         </div>
       </Panel>
     </div>
   );
 }
+
 
 /* ---------------- subjects ---------------- */
 
@@ -2024,10 +2117,14 @@ function Quiz({
   const isLast = idx >= questions.length - 1;
 
   function next(correct: boolean) {
-    if (correct) setScore((s) => s + 1);
-    if (isLast) onFinish();
-    else setIdx((i) => i + 1);
+    const total = score + (correct ? 1 : 0);
+    if (correct) setScore(total);
+    if (isLast) {
+      void reportScore(subject, total, questions.length);
+      onFinish();
+    } else setIdx((i) => i + 1);
   }
+
 
   return (
     <div className="animate-[fadeUp_0.4s_ease-out_both]" key={idx}>
