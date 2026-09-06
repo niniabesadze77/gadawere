@@ -725,6 +725,15 @@ function SettingsMenu({
         </div>
 
         <p className="mt-5 text-xs font-black uppercase tracking-wider text-violet-500">
+          {t.notifyTitle}
+        </p>
+        <div className="mt-2">
+          <NotifyToggle />
+        </div>
+
+
+
+        <p className="mt-5 text-xs font-black uppercase tracking-wider text-violet-500">
           {t.theme}
         </p>
         <div className="mt-2 grid grid-cols-2 gap-2">
