@@ -1,9 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-type Body = { mode: "register" | "login"; phone: string; pass: string };
+type Body = {
+  mode: "register" | "login";
+  phone: string;
+  pass: string;
+  firstName?: string;
+  lastName?: string;
+  birthDate?: string;
+};
 
 function normalizePhone(raw: string) {
-  return raw.trim().toLowerCase().replace(/\s+/g, "");
+  return raw.trim().replace(/[^\d+]/g, "");
 }
 
 async function hash(phone: string, pass: string) {
@@ -30,7 +37,7 @@ export const Route = createFileRoute("/api/public/account")({
         const phone = normalizePhone(String(body.phone ?? ""));
         const pass = String(body.pass ?? "");
 
-        if (phone.length < 3) return json({ error: "bad_phone" }, 400);
+        if (phone.replace(/\D/g, "").length < 6) return json({ error: "bad_phone" }, 400);
         if (pass.length < 4) return json({ error: "short_pass" }, 400);
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -38,7 +45,7 @@ export const Route = createFileRoute("/api/public/account")({
 
         const { data: existing, error: readErr } = await supabaseAdmin
           .from("app_users")
-          .select("id, pass_hash")
+          .select("id, pass_hash, first_name, last_name")
           .eq("phone", phone)
           .maybeSingle();
 
@@ -46,19 +53,28 @@ export const Route = createFileRoute("/api/public/account")({
 
         if (mode === "register") {
           if (existing) return json({ error: "taken" }, 409);
-          const { error } = await supabaseAdmin
-            .from("app_users")
-            .insert({ phone, pass_hash });
+          const firstName = String(body.firstName ?? "").trim();
+          const lastName = String(body.lastName ?? "").trim();
+          const birthDate = String(body.birthDate ?? "").trim();
+          if (!firstName || !lastName || !birthDate) return json({ error: "missing" }, 400);
+
+          const { error } = await supabaseAdmin.from("app_users").insert({
+            phone,
+            pass_hash,
+            first_name: firstName,
+            last_name: lastName,
+            birth_date: birthDate,
+          });
           if (error) {
             return json({ error: error.code === "23505" ? "taken" : "server" }, 409);
           }
-          return json({ ok: true, phone });
+          return json({ ok: true, phone, firstName });
         }
 
         if (!existing || existing.pass_hash !== pass_hash) {
           return json({ error: "bad_credentials" }, 401);
         }
-        return json({ ok: true, phone });
+        return json({ ok: true, phone, firstName: existing.first_name ?? "" });
       },
     },
   },
