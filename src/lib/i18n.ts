@@ -1,4 +1,4 @@
-export type Lang = "ka" | "en";
+export type Lang = "ka" | "en" | "ru";
 
 export const DICT = {
   ka: {
@@ -229,7 +229,41 @@ export const DICT = {
     notifyMsg: "დროა ივარჯიშო! 5 წუთი დღეში საკმარისია 💜",
     blockedTitle: "დროებით დაბლოკილია",
     blockedText: "უხეში სიტყვის გამო AI 2 საათით შეიზღუდა.",
+    firstName: "სახელი",
+    lastName: "გვარი",
+    birthDate: "დაბადების თარიღი",
+    day: "დღე",
+    month: "თვე",
+    year: "წელი",
+    phoneNumber: "ტელეფონის ნომერი",
+    repeatPass: "გაიმეორე პაროლი",
+    passMismatch: "პაროლები არ ემთხვევა",
+    badPhoneNum: "ჩაწერე სწორი ტელეფონის ნომერი",
+    months: [
+      "იანვარი", "თებერვალი", "მარტი", "აპრილი", "მაისი", "ივნისი",
+      "ივლისი", "აგვისტო", "სექტემბერი", "ოქტომბერი", "ნოემბერი", "დეკემბერი",
+    ],
+    notifyPhoneHint: "შეხსენებები მოგივა ამ მოწყობილობაზე",
+    payTitle: "გადახდა",
+    payCardTab: "💳 ბარათი",
+    payBankTab: "🏦 გადარიცხვა",
+    payCardNumber: "ბარათის ნომერი",
+    payExpiry: "ვადა (თთ/წწ)",
+    payCvc: "CVC",
+    payHolder: "სახელი ბარათზე",
+    payNow: "გადახდა",
+    payProcessing: "მუშავდება...",
+    paySent: "მადლობა! გადახდა მიღებულია — ადმინი მალე დაადასტურებს ✅",
+    payWalletSoon: "საფულით გადახდა მალე გააქტიურდება — გამოიყენე ბარათი ან გადარიცხვა",
+    admHintPhone: "ადმინის პანელი ხელმისაწვდომია მხოლოდ დაშვებული ნომრებისთვის",
+    admAddAdmin: "ახალი ადმინი",
+    admMakeAdmin: "დანიშვნა",
+    admFeatures: "ფუნქციების მართვა",
+    admFeatureHint: "გამორთული ფუნქცია მთავარ გვერდზე არავის გამოუჩნდება",
+    admOn: "ჩართული",
+    admOff: "გამორთული",
   },
+
 
   en: {
     brand: "copy it.",
