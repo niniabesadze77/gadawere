@@ -31,22 +31,49 @@ export type Database = {
       }
       app_users: {
         Row: {
+          birth_date: string | null
           created_at: string
+          first_name: string
           id: string
+          last_name: string
           pass_hash: string
           phone: string
         }
         Insert: {
+          birth_date?: string | null
           created_at?: string
+          first_name?: string
           id?: string
+          last_name?: string
           pass_hash: string
           phone: string
         }
         Update: {
+          birth_date?: string | null
           created_at?: string
+          first_name?: string
           id?: string
+          last_name?: string
           pass_hash?: string
           phone?: string
+        }
+        Relationships: []
+      }
+      feature_flags: {
+        Row: {
+          enabled: boolean
+          tool: string
+          updated_at: string
+        }
+        Insert: {
+          enabled?: boolean
+          tool: string
+          updated_at?: string
+        }
+        Update: {
+          enabled?: boolean
+          tool?: string
+          updated_at?: string
         }
         Relationships: []
       }
