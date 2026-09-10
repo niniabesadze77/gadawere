@@ -423,7 +423,11 @@ function Home() {
 
             <div className="animate-[fadeUp_0.9s_cubic-bezier(0.16,1,0.3,1)_both]">
               {!selected ? (
-                <ToolPicker onPick={(s) => setSelected(s)} />
+                <ToolPicker
+                  onPick={(s) => setSelected(s)}
+                  isAdmin={isAdmin}
+                  disabled={disabledTools}
+                />
               ) : (
                 <ToolView
                   tool={selected}
