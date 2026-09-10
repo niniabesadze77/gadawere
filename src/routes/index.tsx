@@ -397,7 +397,7 @@ function Home() {
                   style={{ animationDelay: "120ms" }}
                 >
                   <span className="bg-gradient-to-r from-violet-600 to-blue-600 bg-clip-text text-transparent">
-                    {t.hello}, {account.phone}
+                    {t.hello}, {account.firstName || account.phone}
                   </span>
 
                 </h1>
