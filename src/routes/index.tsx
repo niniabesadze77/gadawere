@@ -903,6 +903,14 @@ function SettingsMenu({
           >
             🇬🇧 English
           </button>
+          <button
+            type="button"
+            onClick={() => setLang("ru")}
+            data-on={lang === "ru"}
+            className="gw-opt col-span-2 rounded-2xl px-3 py-2.5 text-sm font-bold"
+          >
+            🇷🇺 Русский
+          </button>
         </div>
 
         <p className="mt-5 text-xs font-black uppercase tracking-wider text-violet-500">
