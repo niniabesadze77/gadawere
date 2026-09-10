@@ -202,7 +202,7 @@ function Home() {
     const savedWeather = localStorage.getItem("gw-weather") as Weather | null;
     const savedAcc = localStorage.getItem("gw-account");
     setDark(savedTheme === "dark");
-    if (savedLang === "en" || savedLang === "ka") setLang(savedLang);
+    if (savedLang === "en" || savedLang === "ka" || savedLang === "ru") setLang(savedLang);
     if (savedAcc) {
       try {
         setAccount(JSON.parse(savedAcc) as Account);
