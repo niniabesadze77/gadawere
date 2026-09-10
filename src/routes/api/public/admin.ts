@@ -3,9 +3,19 @@ import { createFileRoute } from "@tanstack/react-router";
 type Body = {
   username?: string;
   pass?: string;
-  action?: "stats" | "unban" | "ban" | "approve" | "reject";
+  action?:
+    | "stats"
+    | "unban"
+    | "ban"
+    | "approve"
+    | "reject"
+    | "make_admin"
+    | "remove_admin"
+    | "toggle_feature";
   target?: string;
   subId?: string;
+  tool?: string;
+  enabled?: boolean;
 };
 
 
