@@ -106,7 +106,7 @@ const TOOLS: { id: Tool; emoji: string; active: boolean }[] = [
 ];
 
 
-type Account = { phone: string };
+type Account = { phone: string; firstName?: string };
 
 /* ---------------- typing logo ---------------- */
 
