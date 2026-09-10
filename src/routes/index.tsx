@@ -480,45 +480,82 @@ function Home() {
 function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
   const { t } = useT();
   const [mode, setMode] = useState<"register" | "login">("register");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [day, setDay] = useState("");
+  const [month, setMonth] = useState("");
+  const [year, setYear] = useState("");
   const [phone, setPhone] = useState("");
   const [pass, setPass] = useState("");
+  const [pass2, setPass2] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const thisYear = new Date().getFullYear();
+  const years = Array.from({ length: 60 }, (_, i) => thisYear - 5 - i);
+  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+
+  const digits = phone.replace(/\D/g, "");
+
   async function submit() {
     if (busy) return;
-    if (!phone.trim() || !pass) {
-      setError(t.fillAll);
-      return;
-    }
-    if (phone.trim().length < 3) {
-      setError(t.badPhone);
+    if (digits.length < 9) {
+      setError(t.badPhoneNum);
       return;
     }
     if (pass.length < 4) {
       setError(t.shortPass);
       return;
     }
+    if (mode === "register") {
+      if (!firstName.trim() || !lastName.trim() || !day || !month || !year) {
+        setError(t.fillAll);
+        return;
+      }
+      if (pass !== pass2) {
+        setError(t.passMismatch);
+        return;
+      }
+    }
     setError(null);
     setBusy(true);
     try {
+      const birthDate = `${year}-${String(Number(month) + 1).padStart(2, "0")}-${String(
+        Number(day),
+      ).padStart(2, "0")}`;
       const res = await fetch("/api/public/account", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode, phone: phone.trim(), pass }),
+        body: JSON.stringify({
+          mode,
+          phone: digits,
+          pass,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          birthDate,
+        }),
       });
-      const data = (await res.json()) as { ok?: boolean; phone?: string; error?: string };
+      const data = (await res.json()) as {
+        ok?: boolean;
+        phone?: string;
+        firstName?: string;
+        error?: string;
+      };
       if (!res.ok || !data.ok) {
         const map: Record<string, string> = {
           taken: t.phoneTaken,
           bad_credentials: t.wrongCreds,
-          bad_phone: t.badPhone,
+          bad_phone: t.badPhoneNum,
           short_pass: t.shortPass,
+          missing: t.fillAll,
         };
         setError(map[data.error ?? ""] ?? t.connErr);
         return;
       }
-      onDone({ phone: data.phone ?? phone.trim() });
+      onDone({
+        phone: data.phone ?? digits,
+        firstName: data.firstName ?? firstName.trim(),
+      });
     } catch {
       setError(t.connErr);
     } finally {
@@ -527,18 +564,23 @@ function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
   }
 
   const field =
-    "peer w-full rounded-2xl border border-white/70 bg-white/60 px-4 pb-2.5 pt-6 text-sm font-semibold outline-none backdrop-blur-md transition-all duration-300 focus:border-violet-400 focus:bg-white/85 focus:shadow-[0_10px_30px_-12px_rgba(109,40,217,0.45)]";
+    "w-full rounded-2xl border border-white/70 bg-white/60 px-4 pb-2.5 pt-6 text-sm font-semibold outline-none backdrop-blur-md transition-all duration-300 focus:border-violet-400 focus:bg-white/85 focus:shadow-[0_10px_30px_-12px_rgba(109,40,217,0.45)]";
+  const label =
+    "pointer-events-none absolute left-4 top-2 text-[10px] font-bold uppercase tracking-wide text-violet-500/80";
+  const select =
+    "w-full appearance-none rounded-2xl border border-white/70 bg-white/60 px-3 py-3 text-sm font-semibold outline-none backdrop-blur-md focus:border-violet-400";
 
-  const fields = [
-    { v: phone, set: setPhone, ph: t.phone, type: "text", icon: "👤", d: 0 },
-    { v: pass, set: setPass, ph: t.password, type: "password", icon: "🔒", d: 90 },
-  ];
-
+  const textFields =
+    mode === "register"
+      ? [
+          { v: firstName, set: setFirstName, ph: t.firstName, type: "text", icon: "🙂" },
+          { v: lastName, set: setLastName, ph: t.lastName, type: "text", icon: "🪪" },
+        ]
+      : [];
 
   return (
     <div className="relative z-20 mx-auto flex min-h-screen max-w-md items-center px-4 pb-10 pt-28">
       <div className="relative w-full animate-[sheetUp_0.8s_cubic-bezier(0.16,1,0.3,1)_both]">
-        {/* soft aura behind the card */}
         <div className="pointer-events-none absolute -inset-6 -z-10 rounded-[3rem] bg-[conic-gradient(from_0deg,rgba(167,139,250,0.35),rgba(96,165,250,0.35),rgba(244,182,255,0.35),rgba(167,139,250,0.35))] blur-3xl animate-[auraSpin_18s_linear_infinite]" />
 
         <div className="gw-panel relative overflow-hidden rounded-[2.25rem] p-7">
@@ -557,30 +599,113 @@ function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
             <p className="mt-1.5 text-center text-xs font-medium opacity-70">
               {mode === "register" ? t.registerSub : t.loginSub}
             </p>
-
             <div className="mt-4 h-px w-24 bg-gradient-to-r from-transparent via-violet-400/70 to-transparent" />
           </div>
 
           <div className="relative mt-6 space-y-3.5">
-            {fields.map((f, i) => (
+            {textFields.map((f, i) => (
               <div
-                key={i}
+                key={f.ph}
                 className="relative animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_both]"
-                style={{ animationDelay: `${f.d}ms` }}
+                style={{ animationDelay: `${i * 70}ms` }}
               >
                 <input
                   type={f.type}
                   value={f.v}
                   onChange={(e) => f.set(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && submit()}
                   placeholder=" "
                   className={field}
                 />
-                <span className="pointer-events-none absolute left-4 top-2 text-[10px] font-bold uppercase tracking-wide text-violet-500/80">
+                <span className={label}>
                   {f.icon} {f.ph}
                 </span>
               </div>
             ))}
+
+            {mode === "register" && (
+              <div className="animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_both]">
+                <p className="mb-1.5 ml-1 text-[10px] font-bold uppercase tracking-wide text-violet-500/80">
+                  🎂 {t.birthDate}
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  <select
+                    value={day}
+                    onChange={(e) => setDay(e.target.value)}
+                    className={select}
+                  >
+                    <option value="">{t.day}</option>
+                    {days.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={month}
+                    onChange={(e) => setMonth(e.target.value)}
+                    className={select}
+                  >
+                    <option value="">{t.month}</option>
+                    {t.months.map((m, i) => (
+                      <option key={m} value={i}>
+                        {m}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                    className={select}
+                  >
+                    <option value="">{t.year}</option>
+                    {years.map((y) => (
+                      <option key={y} value={y}>
+                        {y}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
+
+            <div className="relative animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_both]">
+              <input
+                type="tel"
+                inputMode="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && submit()}
+                placeholder=" "
+                className={field}
+              />
+              <span className={label}>📱 {t.phoneNumber}</span>
+            </div>
+
+            <div className="relative animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_both]">
+              <input
+                type="password"
+                value={pass}
+                onChange={(e) => setPass(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && submit()}
+                placeholder=" "
+                className={field}
+              />
+              <span className={label}>🔒 {t.password}</span>
+            </div>
+
+            {mode === "register" && (
+              <div className="relative animate-[fadeUp_0.6s_cubic-bezier(0.16,1,0.3,1)_both]">
+                <input
+                  type="password"
+                  value={pass2}
+                  onChange={(e) => setPass2(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && submit()}
+                  placeholder=" "
+                  className={field}
+                />
+                <span className={label}>🔐 {t.repeatPass}</span>
+              </div>
+            )}
           </div>
 
           {error && (
@@ -609,11 +734,9 @@ function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
           >
             {mode === "register" ? t.haveAccount : t.noAccount}
           </button>
-
         </div>
       </div>
     </div>
-
   );
 }
 
