@@ -1250,8 +1250,19 @@ function InstallApp() {
 
 /* ---------------- tools ---------------- */
 
-function ToolPicker({ onPick }: { onPick: (s: Tool) => void }) {
+function ToolPicker({
+  onPick,
+  isAdmin,
+  disabled,
+}: {
+  onPick: (s: Tool) => void;
+  isAdmin: boolean;
+  disabled: string[];
+}) {
   const { t } = useT();
+  const visible = TOOLS.filter(
+    (s) => (s.id !== "admin" || isAdmin) && !disabled.includes(s.id),
+  );
   return (
     <div>
       <h2 className="text-center text-3xl font-black tracking-tight sm:text-4xl">
