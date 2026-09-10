@@ -1274,7 +1274,7 @@ function ToolPicker({
       <p className="mt-2 text-center text-sm text-slate-500">{t.toolsHint}</p>
 
       <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {TOOLS.map((s, i) => (
+        {visible.map((s, i) => (
           <button
             key={s.id}
             type="button"
