@@ -247,6 +247,29 @@ function Home() {
 
   useEffect(() => startDailyReminder(t.notifyMsg), [t.notifyMsg]);
 
+  /* admin access + feature flags */
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [disabledTools, setDisabledTools] = useState<string[]>([]);
+
+  const loadConfig = useCallback(async () => {
+    try {
+      const res = await fetch("/api/public/config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: account?.phone ?? "" }),
+      });
+      const data = (await res.json()) as { isAdmin?: boolean; disabled?: string[] };
+      setIsAdmin(!!data.isAdmin);
+      setDisabledTools(data.disabled ?? []);
+    } catch {
+      /* offline — keep defaults */
+    }
+  }, [account?.phone]);
+
+  useEffect(() => {
+    void loadConfig();
+  }, [loadConfig]);
+
 
   function advance() {
     if (phase === "intro") setPhase(account ? "ready" : "auth");
