@@ -110,42 +110,66 @@ export const Route = createFileRoute("/api/public/admin")({
             .eq("id", body.subId);
         }
 
+        if (action === "make_admin" && body.target) {
+          const t = normalize(body.target);
+          if (t) await supabaseAdmin.from("admins").upsert({ username: t });
+        }
+
+        if (action === "remove_admin" && body.target) {
+          const t = normalize(body.target);
+          if (t && t !== username) {
+            await supabaseAdmin.from("admins").delete().eq("username", t);
+          }
+        }
+
+        if (action === "toggle_feature" && body.tool) {
+          await supabaseAdmin.from("feature_flags").upsert({
+            tool: body.tool,
+            enabled: !!body.enabled,
+            updated_at: nowIso,
+          });
+        }
+
         const online = new Date(now.getTime() - 2 * 60 * 1000).toISOString();
 
-        const [flags, strikes, onlineRes, todayRes, totalUsers, subs] = await Promise.all([
-
-          supabaseAdmin
-            .from("flags")
-            .select("id, username, text, word, created_at")
-            .order("created_at", { ascending: false })
-            .limit(50),
-          supabaseAdmin
-            .from("strikes")
-            .select("id, username, until, reason, created_at")
-            .gt("until", nowIso)
-            .order("until", { ascending: false })
-            .limit(50),
-          supabaseAdmin
-            .from("presence")
-            .select("username", { count: "exact", head: true })
-            .gt("last_seen", online),
-          supabaseAdmin
-            .from("visits")
-            .select("id", { count: "exact", head: true })
-            .eq("day", nowIso.slice(0, 10)),
-          supabaseAdmin.from("app_users").select("id", { count: "exact", head: true }),
-          supabaseAdmin
-            .from("subscriptions")
-            .select("id, username, plan, status, payment_code, expires_at, created_at")
-            .order("created_at", { ascending: false })
-            .limit(50),
-        ]);
+        const [flags, strikes, onlineRes, todayRes, totalUsers, subs, admins, features] =
+          await Promise.all([
+            supabaseAdmin
+              .from("flags")
+              .select("id, username, text, word, created_at")
+              .order("created_at", { ascending: false })
+              .limit(50),
+            supabaseAdmin
+              .from("strikes")
+              .select("id, username, until, reason, created_at")
+              .gt("until", nowIso)
+              .order("until", { ascending: false })
+              .limit(50),
+            supabaseAdmin
+              .from("presence")
+              .select("username", { count: "exact", head: true })
+              .gt("last_seen", online),
+            supabaseAdmin
+              .from("visits")
+              .select("id", { count: "exact", head: true })
+              .eq("day", nowIso.slice(0, 10)),
+            supabaseAdmin.from("app_users").select("id", { count: "exact", head: true }),
+            supabaseAdmin
+              .from("subscriptions")
+              .select("id, username, plan, status, payment_code, expires_at, created_at")
+              .order("created_at", { ascending: false })
+              .limit(50),
+            supabaseAdmin.from("admins").select("username").order("username"),
+            supabaseAdmin.from("feature_flags").select("tool, enabled").order("tool"),
+          ]);
 
         return json({
           ok: true,
           flags: flags.data ?? [],
           strikes: strikes.data ?? [],
           subs: subs.data ?? [],
+          admins: admins.data ?? [],
+          features: features.data ?? [],
           online: onlineRes.count ?? 0,
           today: todayRes.count ?? 0,
           users: totalUsers.count ?? 0,
