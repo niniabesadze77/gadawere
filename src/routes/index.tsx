@@ -795,21 +795,24 @@ function NotifyToggle() {
   useEffect(() => setOn(notifyEnabled()), []);
 
   return (
-    <button
-      type="button"
-      data-on={on}
-      onClick={async () => {
-        if (on) {
-          disableNotifications();
-          setOn(false);
-        } else {
-          setOn(await enableNotifications());
-        }
-      }}
-      className="gw-opt w-full rounded-2xl px-3 py-2.5 text-sm font-bold"
-    >
-      {on ? `🔔 ${t.notifyOff}` : `🔕 ${t.notifyOn}`}
-    </button>
+    <div className="space-y-1.5">
+      <button
+        type="button"
+        data-on={on}
+        onClick={async () => {
+          if (on) {
+            disableNotifications();
+            setOn(false);
+          } else {
+            setOn(await enableNotifications());
+          }
+        }}
+        className="gw-opt w-full rounded-2xl px-3 py-2.5 text-sm font-bold"
+      >
+        {on ? `🔔 ${t.notifyOff}` : `🔕 ${t.notifyOn}`}
+      </button>
+      <p className="px-1 text-[11px] opacity-60">{t.notifyPhoneHint}</p>
+    </div>
   );
 }
 
