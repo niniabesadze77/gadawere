@@ -61,6 +61,7 @@ export default function AdminPanel({ username }: { username: string }) {
     return (
       <div className="space-y-3">
         <p className="text-sm opacity-70">{t.admHint}</p>
+        <p className="text-xs opacity-60">{t.admHintPhone}</p>
         <input
           type="password"
           value={pass}
