@@ -11,10 +11,13 @@ type Sub = {
   payment_code: string;
   expires_at: string | null;
 };
+type Feature = { tool: string; enabled: boolean };
 type Stats = {
   flags: Flag[];
   strikes: Strike[];
   subs: Sub[];
+  admins: { username: string }[];
+  features: Feature[];
   online: number;
   today: number;
   users: number;
@@ -28,6 +31,7 @@ export default function AdminPanel({ username }: { username: string }) {
   const [busy, setBusy] = useState(false);
   const [data, setData] = useState<Stats | null>(null);
   const [target, setTarget] = useState("");
+  const [newAdmin, setNewAdmin] = useState("");
 
   async function call(payload: Record<string, unknown> = {}) {
     setBusy(true);
