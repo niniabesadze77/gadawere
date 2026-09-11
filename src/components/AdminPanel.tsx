@@ -11,10 +11,13 @@ type Sub = {
   payment_code: string;
   expires_at: string | null;
 };
+type Feature = { tool: string; enabled: boolean };
 type Stats = {
   flags: Flag[];
   strikes: Strike[];
   subs: Sub[];
+  admins: { username: string }[];
+  features: Feature[];
   online: number;
   today: number;
   users: number;
@@ -28,6 +31,7 @@ export default function AdminPanel({ username }: { username: string }) {
   const [busy, setBusy] = useState(false);
   const [data, setData] = useState<Stats | null>(null);
   const [target, setTarget] = useState("");
+  const [newAdmin, setNewAdmin] = useState("");
 
   async function call(payload: Record<string, unknown> = {}) {
     setBusy(true);
@@ -57,6 +61,7 @@ export default function AdminPanel({ username }: { username: string }) {
     return (
       <div className="space-y-3">
         <p className="text-sm opacity-70">{t.admHint}</p>
+        <p className="text-xs opacity-60">{t.admHintPhone}</p>
         <input
           type="password"
           value={pass}
@@ -118,6 +123,72 @@ export default function AdminPanel({ username }: { username: string }) {
           ✅ {t.admUnban}
         </button>
       </div>
+
+      <Card className="space-y-2">
+        <div className="text-sm font-black">{t.admAddAdmin}</div>
+        <div className="flex gap-2">
+          <input
+            value={newAdmin}
+            onChange={(e) => setNewAdmin(e.target.value)}
+            placeholder="5XXXXXXXX"
+            className="gw-input flex-1 rounded-2xl px-3 py-2 text-sm"
+          />
+          <button
+            type="button"
+            disabled={busy || !newAdmin}
+            onClick={() => {
+              void call({ action: "make_admin", target: newAdmin });
+              setNewAdmin("");
+            }}
+            className="gw-glass rounded-2xl px-3 py-2 text-xs font-bold"
+          >
+            👑 {t.admMakeAdmin}
+          </button>
+        </div>
+        <ul className="flex flex-wrap gap-2">
+          {(data?.admins ?? []).map((a) => (
+            <li
+              key={a.username}
+              className="flex items-center gap-1.5 rounded-full bg-violet-100 px-2.5 py-1 text-[11px] font-bold text-violet-700"
+            >
+              {a.username}
+              {a.username !== username && (
+                <button
+                  type="button"
+                  onClick={() => void call({ action: "remove_admin", target: a.username })}
+                  className="bg-transparent text-violet-500"
+                >
+                  ✕
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      </Card>
+
+      <Card className="space-y-2">
+        <div className="text-sm font-black">{t.admFeatures}</div>
+        <p className="text-xs opacity-60">{t.admFeatureHint}</p>
+        <ul className="space-y-1.5">
+          {(data?.features ?? []).map((f) => (
+            <li key={f.tool} className="flex items-center gap-2 text-sm">
+              <span className="flex-1 font-bold capitalize">{f.tool}</span>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() =>
+                  void call({ action: "toggle_feature", tool: f.tool, enabled: !f.enabled })
+                }
+                className={`rounded-full px-3 py-1 text-[11px] font-bold ${
+                  f.enabled ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"
+                }`}
+              >
+                {f.enabled ? t.admOn : t.admOff}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </Card>
 
       <Card>
         <div className="text-sm font-black">{t.admSubs}</div>
