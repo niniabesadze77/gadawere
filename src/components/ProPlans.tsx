@@ -16,6 +16,14 @@ export default function ProPlans({ username }: { username: string }) {
   const [active, setActive] = useState(false);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [tab, setTab] = useState<"card" | "bank">("card");
+  const [card, setCard] = useState("");
+  const [exp, setExp] = useState("");
+  const [cvc, setCvc] = useState("");
+  const [holder, setHolder] = useState("");
+  const [paying, setPaying] = useState(false);
+  const [paid, setPaid] = useState(false);
+  const [walletNote, setWalletNote] = useState(false);
 
   async function call(payload: Record<string, unknown>) {
     setBusy(true);
