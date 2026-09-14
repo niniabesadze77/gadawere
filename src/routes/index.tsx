@@ -252,23 +252,33 @@ function Home() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [disabledTools, setDisabledTools] = useState<string[]>([]);
 
-  const loadConfig = useCallback(async () => {
-    try {
-      const res = await fetch("/api/public/config", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: account?.phone ?? "" }),
-      });
-      const data = (await res.json()) as { isAdmin?: boolean; disabled?: string[] };
-      setIsAdmin(!!data.isAdmin);
-      setDisabledTools(data.disabled ?? []);
-    } catch {
-      /* offline — keep defaults */
-    }
-  }, [account?.phone]);
+  const phone = account?.phone ?? "";
+
+  const loadConfig = useCallback(
+    async (alive?: { current: boolean }) => {
+      try {
+        const res = await fetch("/api/public/config", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: phone }),
+        });
+        const data = (await res.json()) as { isAdmin?: boolean; disabled?: string[] };
+        if (alive && !alive.current) return;
+        setIsAdmin(!!data.isAdmin);
+        setDisabledTools(data.disabled ?? []);
+      } catch {
+        /* offline — keep defaults */
+      }
+    },
+    [phone],
+  );
 
   useEffect(() => {
-    void loadConfig();
+    const alive = { current: true };
+    void loadConfig(alive);
+    return () => {
+      alive.current = false;
+    };
   }, [loadConfig]);
 
 
