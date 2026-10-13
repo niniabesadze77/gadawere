@@ -10,61 +10,60 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiPublicTutorChatRouteImport } from './routes/api/public/tutor-chat'
-import { Route as ApiPublicSubscribeRouteImport } from './routes/api/public/subscribe'
-import { Route as ApiPublicSolveMathRouteImport } from './routes/api/public/solve-math'
-import { Route as ApiPublicScoresRouteImport } from './routes/api/public/scores'
-import { Route as ApiPublicScheduleRouteImport } from './routes/api/public/schedule'
-import { Route as ApiPublicPresentationGenerateRouteImport } from './routes/api/public/presentation-generate'
-import { Route as ApiPublicPresenceRouteImport } from './routes/api/public/presence'
-import { Route as ApiPublicPracticeGenerateRouteImport } from './routes/api/public/practice-generate'
-import { Route as ApiPublicModerateRouteImport } from './routes/api/public/moderate'
-import { Route as ApiPublicMathChatRouteImport } from './routes/api/public/math-chat'
-import { Route as ApiPublicImproveEssayRouteImport } from './routes/api/public/improve-essay'
-import { Route as ApiPublicEssayGenerateRouteImport } from './routes/api/public/essay-generate'
-import { Route as ApiPublicConfigRouteImport } from './routes/api/public/config'
-import { Route as ApiPublicAdminRouteImport } from './routes/api/public/admin'
 import { Route as ApiPublicAccountRouteImport } from './routes/api/public/account'
+import { Route as ApiPublicAdminRouteImport } from './routes/api/public/admin'
+import { Route as ApiPublicConfigRouteImport } from './routes/api/public/config'
+import { Route as ApiPublicEssayGenerateRouteImport } from './routes/api/public/essay-generate'
+import { Route as ApiPublicImproveEssayRouteImport } from './routes/api/public/improve-essay'
+import { Route as ApiPublicMathChatRouteImport } from './routes/api/public/math-chat'
+import { Route as ApiPublicModerateRouteImport } from './routes/api/public/moderate'
+import { Route as ApiPublicPracticeGenerateRouteImport } from './routes/api/public/practice-generate'
+import { Route as ApiPublicPresenceRouteImport } from './routes/api/public/presence'
+import { Route as ApiPublicPresentationGenerateRouteImport } from './routes/api/public/presentation-generate'
+import { Route as ApiPublicScheduleRouteImport } from './routes/api/public/schedule'
+import { Route as ApiPublicScoresRouteImport } from './routes/api/public/scores'
+import { Route as ApiPublicSolveMathRouteImport } from './routes/api/public/solve-math'
+import { Route as ApiPublicSubscribeRouteImport } from './routes/api/public/subscribe'
+import { Route as ApiPublicTutorChatRouteImport } from './routes/api/public/tutor-chat'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicTutorChatRoute = ApiPublicTutorChatRouteImport.update({
-  id: '/api/public/tutor-chat',
-  path: '/api/public/tutor-chat',
+const ApiPublicAccountRoute = ApiPublicAccountRouteImport.update({
+  id: '/api/public/account',
+  path: '/api/public/account',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicSubscribeRoute = ApiPublicSubscribeRouteImport.update({
-  id: '/api/public/subscribe',
-  path: '/api/public/subscribe',
+const ApiPublicAdminRoute = ApiPublicAdminRouteImport.update({
+  id: '/api/public/admin',
+  path: '/api/public/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicSolveMathRoute = ApiPublicSolveMathRouteImport.update({
-  id: '/api/public/solve-math',
-  path: '/api/public/solve-math',
+const ApiPublicConfigRoute = ApiPublicConfigRouteImport.update({
+  id: '/api/public/config',
+  path: '/api/public/config',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicScoresRoute = ApiPublicScoresRouteImport.update({
-  id: '/api/public/scores',
-  path: '/api/public/scores',
+const ApiPublicEssayGenerateRoute = ApiPublicEssayGenerateRouteImport.update({
+  id: '/api/public/essay-generate',
+  path: '/api/public/essay-generate',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicScheduleRoute = ApiPublicScheduleRouteImport.update({
-  id: '/api/public/schedule',
-  path: '/api/public/schedule',
+const ApiPublicImproveEssayRoute = ApiPublicImproveEssayRouteImport.update({
+  id: '/api/public/improve-essay',
+  path: '/api/public/improve-essay',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicPresentationGenerateRoute =
-  ApiPublicPresentationGenerateRouteImport.update({
-    id: '/api/public/presentation-generate',
-    path: '/api/public/presentation-generate',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicPresenceRoute = ApiPublicPresenceRouteImport.update({
-  id: '/api/public/presence',
-  path: '/api/public/presence',
+const ApiPublicMathChatRoute = ApiPublicMathChatRouteImport.update({
+  id: '/api/public/math-chat',
+  path: '/api/public/math-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicModerateRoute = ApiPublicModerateRouteImport.update({
+  id: '/api/public/moderate',
+  path: '/api/public/moderate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicPracticeGenerateRoute =
@@ -73,39 +72,40 @@ const ApiPublicPracticeGenerateRoute =
     path: '/api/public/practice-generate',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicModerateRoute = ApiPublicModerateRouteImport.update({
-  id: '/api/public/moderate',
-  path: '/api/public/moderate',
+const ApiPublicPresenceRoute = ApiPublicPresenceRouteImport.update({
+  id: '/api/public/presence',
+  path: '/api/public/presence',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicMathChatRoute = ApiPublicMathChatRouteImport.update({
-  id: '/api/public/math-chat',
-  path: '/api/public/math-chat',
+const ApiPublicPresentationGenerateRoute =
+  ApiPublicPresentationGenerateRouteImport.update({
+    id: '/api/public/presentation-generate',
+    path: '/api/public/presentation-generate',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicScheduleRoute = ApiPublicScheduleRouteImport.update({
+  id: '/api/public/schedule',
+  path: '/api/public/schedule',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicImproveEssayRoute = ApiPublicImproveEssayRouteImport.update({
-  id: '/api/public/improve-essay',
-  path: '/api/public/improve-essay',
+const ApiPublicScoresRoute = ApiPublicScoresRouteImport.update({
+  id: '/api/public/scores',
+  path: '/api/public/scores',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicEssayGenerateRoute = ApiPublicEssayGenerateRouteImport.update({
-  id: '/api/public/essay-generate',
-  path: '/api/public/essay-generate',
+const ApiPublicSolveMathRoute = ApiPublicSolveMathRouteImport.update({
+  id: '/api/public/solve-math',
+  path: '/api/public/solve-math',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicConfigRoute = ApiPublicConfigRouteImport.update({
-  id: '/api/public/config',
-  path: '/api/public/config',
+const ApiPublicSubscribeRoute = ApiPublicSubscribeRouteImport.update({
+  id: '/api/public/subscribe',
+  path: '/api/public/subscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicAdminRoute = ApiPublicAdminRouteImport.update({
-  id: '/api/public/admin',
-  path: '/api/public/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicAccountRoute = ApiPublicAccountRouteImport.update({
-  id: '/api/public/account',
-  path: '/api/public/account',
+const ApiPublicTutorChatRoute = ApiPublicTutorChatRouteImport.update({
+  id: '/api/public/tutor-chat',
+  path: '/api/public/tutor-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -249,95 +249,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/tutor-chat': {
-      id: '/api/public/tutor-chat'
-      path: '/api/public/tutor-chat'
-      fullPath: '/api/public/tutor-chat'
-      preLoaderRoute: typeof ApiPublicTutorChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/subscribe': {
-      id: '/api/public/subscribe'
-      path: '/api/public/subscribe'
-      fullPath: '/api/public/subscribe'
-      preLoaderRoute: typeof ApiPublicSubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/solve-math': {
-      id: '/api/public/solve-math'
-      path: '/api/public/solve-math'
-      fullPath: '/api/public/solve-math'
-      preLoaderRoute: typeof ApiPublicSolveMathRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/scores': {
-      id: '/api/public/scores'
-      path: '/api/public/scores'
-      fullPath: '/api/public/scores'
-      preLoaderRoute: typeof ApiPublicScoresRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/schedule': {
-      id: '/api/public/schedule'
-      path: '/api/public/schedule'
-      fullPath: '/api/public/schedule'
-      preLoaderRoute: typeof ApiPublicScheduleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/presentation-generate': {
-      id: '/api/public/presentation-generate'
-      path: '/api/public/presentation-generate'
-      fullPath: '/api/public/presentation-generate'
-      preLoaderRoute: typeof ApiPublicPresentationGenerateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/presence': {
-      id: '/api/public/presence'
-      path: '/api/public/presence'
-      fullPath: '/api/public/presence'
-      preLoaderRoute: typeof ApiPublicPresenceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/practice-generate': {
-      id: '/api/public/practice-generate'
-      path: '/api/public/practice-generate'
-      fullPath: '/api/public/practice-generate'
-      preLoaderRoute: typeof ApiPublicPracticeGenerateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/moderate': {
-      id: '/api/public/moderate'
-      path: '/api/public/moderate'
-      fullPath: '/api/public/moderate'
-      preLoaderRoute: typeof ApiPublicModerateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/math-chat': {
-      id: '/api/public/math-chat'
-      path: '/api/public/math-chat'
-      fullPath: '/api/public/math-chat'
-      preLoaderRoute: typeof ApiPublicMathChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/improve-essay': {
-      id: '/api/public/improve-essay'
-      path: '/api/public/improve-essay'
-      fullPath: '/api/public/improve-essay'
-      preLoaderRoute: typeof ApiPublicImproveEssayRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/essay-generate': {
-      id: '/api/public/essay-generate'
-      path: '/api/public/essay-generate'
-      fullPath: '/api/public/essay-generate'
-      preLoaderRoute: typeof ApiPublicEssayGenerateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/config': {
-      id: '/api/public/config'
-      path: '/api/public/config'
-      fullPath: '/api/public/config'
-      preLoaderRoute: typeof ApiPublicConfigRouteImport
+    '/api/public/account': {
+      id: '/api/public/account'
+      path: '/api/public/account'
+      fullPath: '/api/public/account'
+      preLoaderRoute: typeof ApiPublicAccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/admin': {
@@ -347,11 +263,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/account': {
-      id: '/api/public/account'
-      path: '/api/public/account'
-      fullPath: '/api/public/account'
-      preLoaderRoute: typeof ApiPublicAccountRouteImport
+    '/api/public/config': {
+      id: '/api/public/config'
+      path: '/api/public/config'
+      fullPath: '/api/public/config'
+      preLoaderRoute: typeof ApiPublicConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/essay-generate': {
+      id: '/api/public/essay-generate'
+      path: '/api/public/essay-generate'
+      fullPath: '/api/public/essay-generate'
+      preLoaderRoute: typeof ApiPublicEssayGenerateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/improve-essay': {
+      id: '/api/public/improve-essay'
+      path: '/api/public/improve-essay'
+      fullPath: '/api/public/improve-essay'
+      preLoaderRoute: typeof ApiPublicImproveEssayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/math-chat': {
+      id: '/api/public/math-chat'
+      path: '/api/public/math-chat'
+      fullPath: '/api/public/math-chat'
+      preLoaderRoute: typeof ApiPublicMathChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/moderate': {
+      id: '/api/public/moderate'
+      path: '/api/public/moderate'
+      fullPath: '/api/public/moderate'
+      preLoaderRoute: typeof ApiPublicModerateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/practice-generate': {
+      id: '/api/public/practice-generate'
+      path: '/api/public/practice-generate'
+      fullPath: '/api/public/practice-generate'
+      preLoaderRoute: typeof ApiPublicPracticeGenerateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/presence': {
+      id: '/api/public/presence'
+      path: '/api/public/presence'
+      fullPath: '/api/public/presence'
+      preLoaderRoute: typeof ApiPublicPresenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/presentation-generate': {
+      id: '/api/public/presentation-generate'
+      path: '/api/public/presentation-generate'
+      fullPath: '/api/public/presentation-generate'
+      preLoaderRoute: typeof ApiPublicPresentationGenerateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/schedule': {
+      id: '/api/public/schedule'
+      path: '/api/public/schedule'
+      fullPath: '/api/public/schedule'
+      preLoaderRoute: typeof ApiPublicScheduleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/scores': {
+      id: '/api/public/scores'
+      path: '/api/public/scores'
+      fullPath: '/api/public/scores'
+      preLoaderRoute: typeof ApiPublicScoresRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/solve-math': {
+      id: '/api/public/solve-math'
+      path: '/api/public/solve-math'
+      fullPath: '/api/public/solve-math'
+      preLoaderRoute: typeof ApiPublicSolveMathRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/subscribe': {
+      id: '/api/public/subscribe'
+      path: '/api/public/subscribe'
+      fullPath: '/api/public/subscribe'
+      preLoaderRoute: typeof ApiPublicSubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/tutor-chat': {
+      id: '/api/public/tutor-chat'
+      path: '/api/public/tutor-chat'
+      fullPath: '/api/public/tutor-chat'
+      preLoaderRoute: typeof ApiPublicTutorChatRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
