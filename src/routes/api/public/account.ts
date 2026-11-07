@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
+import { normalizePhone } from "@/lib/phone";
 
 type Body = {
   mode: "register" | "login";
@@ -8,10 +10,6 @@ type Body = {
   lastName?: string;
   birthDate?: string;
 };
-
-function normalizePhone(raw: string) {
-  return raw.trim().replace(/[^\d+]/g, "");
-}
 
 async function hash(phone: string, pass: string) {
   const data = new TextEncoder().encode(`gw::${phone}::${pass}`);
@@ -24,20 +22,39 @@ async function hash(phone: string, pass: string) {
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
   });
 }
 
 export const Route = createFileRoute("/api/public/account")({
   server: {
     handlers: {
+      GET: async ({ request }) => {
+        const { accountSession } = await import("@/lib/session.server");
+        const session = await accountSession(request);
+        const phone = session.data.phone;
+        if (!phone) return json({ ok: false }, 401);
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: user } = await supabaseAdmin.from("app_users").select("phone, first_name").eq("phone", phone).maybeSingle();
+        if (!user) { await session.clear(); return json({ ok: false }, 401); }
+        const { data: admin, error } = await supabaseAdmin.from("admins").select("username").eq("username", phone).maybeSingle();
+        if (error) return json({ error: "server" }, 503);
+        return json({ ok: true, phone, firstName: user.first_name, isAdmin: !!admin });
+      },
+      DELETE: async ({ request }) => {
+        const { accountSession } = await import("@/lib/session.server");
+        await (await accountSession(request)).clear();
+        return json({ ok: true });
+      },
       POST: async ({ request }) => {
-        const body = (await request.json()) as Partial<Body>;
+        const parsed = z.object({ mode: z.enum(["register", "login"]), phone: z.string().max(30), pass: z.string().min(4).max(128), firstName: z.string().max(100).optional(), lastName: z.string().max(100).optional(), birthDate: z.string().max(20).optional() }).safeParse(await request.json().catch(() => null));
+        if (!parsed.success) return json({ error: "missing" }, 400);
+        const body: Partial<Body> = parsed.data;
         const mode = body.mode === "login" ? "login" : "register";
         const phone = normalizePhone(String(body.phone ?? ""));
         const pass = String(body.pass ?? "");
 
-        if (phone.replace(/\D/g, "").length < 6) return json({ error: "bad_phone" }, 400);
+        if (!/^5\d{8}$/.test(phone)) return json({ error: "bad_phone" }, 400);
         if (pass.length < 4) return json({ error: "short_pass" }, 400);
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -68,13 +85,20 @@ export const Route = createFileRoute("/api/public/account")({
           if (error) {
             return json({ error: error.code === "23505" ? "taken" : "server" }, 409);
           }
-          return json({ ok: true, phone, firstName });
+          const { accountSession } = await import("@/lib/session.server");
+          await (await accountSession(request)).update({ phone });
+          const { data: admin } = await supabaseAdmin.from("admins").select("username").eq("username", phone).maybeSingle();
+          return json({ ok: true, phone, firstName, isAdmin: !!admin });
         }
 
         if (!existing || existing.pass_hash !== pass_hash) {
           return json({ error: "bad_credentials" }, 401);
         }
-        return json({ ok: true, phone, firstName: existing.first_name ?? "" });
+        const { accountSession } = await import("@/lib/session.server");
+        await (await accountSession(request)).update({ phone });
+        const { data: admin, error: adminError } = await supabaseAdmin.from("admins").select("username").eq("username", phone).maybeSingle();
+        if (adminError) return json({ error: "server" }, 503);
+        return json({ ok: true, phone, firstName: existing.first_name ?? "", isAdmin: !!admin });
       },
     },
   },
