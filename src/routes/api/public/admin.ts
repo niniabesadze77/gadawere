@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
+import { normalizePhone } from "@/lib/phone";
 
 type Body = {
   username?: string;
@@ -42,12 +44,14 @@ export const Route = createFileRoute("/api/public/admin")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const body = (await request.json()) as Body;
-        const username = normalize(String(body.username ?? ""));
-        const pass = String(body.pass ?? "");
+        const parsed = z.object({ action: z.enum(["stats", "unban", "ban", "approve", "reject", "make_admin", "remove_admin", "toggle_feature"]).optional(), target: z.string().max(30).optional(), subId: z.string().uuid().optional(), tool: z.enum(["essay", "presentation", "tutor", "leaderboard", "schedule", "pro"]).optional(), enabled: z.boolean().optional() }).safeParse(await request.json().catch(() => null));
+        if (!parsed.success) return json({ error: "invalid_input" }, 400);
+        const body: Body = parsed.data;
+        const { accountSession } = await import("@/lib/session.server");
+        const username = (await accountSession(request)).data.phone;
         const action = body.action ?? "stats";
 
-        if (!pass || !username) return json({ error: "unauthorized" }, 401);
+        if (!username) return json({ error: "unauthorized" }, 401);
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -57,14 +61,6 @@ export const Route = createFileRoute("/api/public/admin")({
           .eq("username", username)
           .maybeSingle();
         if (!admin) return json({ error: "unauthorized" }, 401);
-
-        const { data: user } = await supabaseAdmin
-          .from("app_users")
-          .select("pass_hash")
-          .eq("phone", username)
-          .maybeSingle();
-        if (!user || user.pass_hash !== (await hash(username, pass)))
-          return json({ error: "unauthorized" }, 401);
 
         const now = new Date();
         const nowIso = now.toISOString();
@@ -111,13 +107,17 @@ export const Route = createFileRoute("/api/public/admin")({
         }
 
         if (action === "make_admin" && body.target) {
-          const t = normalize(body.target);
-          if (t) await supabaseAdmin.from("admins").upsert({ username: t });
+          const t = normalizePhone(body.target);
+          if (!/^5\d{8}$/.test(t)) return json({ error: "bad_phone" }, 400);
+          const { data: target } = await supabaseAdmin.from("app_users").select("phone").eq("phone", t).maybeSingle();
+          if (!target) return json({ error: "account_not_found" }, 404);
+          const { error } = await supabaseAdmin.from("admins").upsert({ username: t });
+          if (error) return json({ error: "server" }, 500);
         }
 
         if (action === "remove_admin" && body.target) {
           const t = normalize(body.target);
-          if (t && t !== username) {
+          if (t && t !== username && !["557099944", "555673731"].includes(t)) {
             await supabaseAdmin.from("admins").delete().eq("username", t);
           }
         }

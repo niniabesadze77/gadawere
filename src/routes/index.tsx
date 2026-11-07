@@ -29,6 +29,7 @@ import ProPlans from "@/components/ProPlans";
 import AdminPanel from "@/components/AdminPanel";
 import { installModeration, pingPresence, onBlockChange, getBlockedUntil } from "@/lib/moderation";
 import { reportScore } from "@/lib/account";
+import { normalizePhone } from "@/lib/phone";
 import {
   disableNotifications,
   enableNotifications,
@@ -107,7 +108,7 @@ const TOOLS: { id: Tool; emoji: string; active: boolean }[] = [
 ];
 
 
-type Account = { phone: string; firstName?: string };
+type Account = { phone: string; firstName?: string; isAdmin?: boolean };
 
 /* ---------------- typing logo ---------------- */
 
@@ -201,16 +202,17 @@ function Home() {
     const savedTheme = localStorage.getItem("gw-theme");
     const savedLang = localStorage.getItem("gw-lang") as Lang | null;
     const savedWeather = localStorage.getItem("gw-weather") as Weather | null;
-    const savedAcc = localStorage.getItem("gw-account");
     setDark(savedTheme === "dark");
     if (savedLang === "en" || savedLang === "ka" || savedLang === "ru") setLang(savedLang);
-    if (savedAcc) {
-      try {
-        setAccount(JSON.parse(savedAcc) as Account);
-      } catch {
-        /* ignore */
-      }
-    }
+    void fetch("/api/public/account", { cache: "no-store" })
+      .then(async (res) => {
+        if (!res.ok) return;
+        const acc = await res.json() as Account & { ok?: boolean };
+        if (!acc.ok) return;
+        setAccount(acc);
+        setIsAdmin(!!acc.isAdmin);
+        setPhase("ready");
+      }).catch(() => {});
     if (savedWeather && WEATHERS.some((w) => w.id === savedWeather)) {
       setWeather(savedWeather);
     } else {
@@ -263,6 +265,7 @@ function Home() {
           body: JSON.stringify({ username: phone }),
         });
         const data = (await res.json()) as { isAdmin?: boolean; disabled?: string[] };
+        if (!res.ok) return;
         if (alive && !alive.current) return;
         setIsAdmin(!!data.isAdmin);
         setDisabledTools(data.disabled ?? []);
@@ -276,8 +279,13 @@ function Home() {
   useEffect(() => {
     const alive = { current: true };
     void loadConfig(alive);
+    const refresh = () => void loadConfig(alive);
+    window.addEventListener("focus", refresh);
+    const interval = window.setInterval(refresh, 30_000);
     return () => {
       alive.current = false;
+      window.removeEventListener("focus", refresh);
+      window.clearInterval(interval);
     };
   }, [loadConfig]);
 
@@ -289,13 +297,16 @@ function Home() {
   function onRegistered(acc: Account) {
     localStorage.setItem("gw-account", JSON.stringify(acc));
     setAccount(acc);
+    setIsAdmin(!!acc.isAdmin);
     setPhase("signing");
     setTimeout(() => setPhase("ready"), 2200);
   }
 
   function logout() {
+    void fetch("/api/public/account", { method: "DELETE" });
     localStorage.removeItem("gw-account");
     setAccount(null);
+    setIsAdmin(false);
     setSelected(null);
     setMenu(false);
     setPhase("auth");
@@ -436,7 +447,7 @@ function Home() {
               {!selected ? (
                 <ToolPicker
                   onPick={(s) => setSelected(s)}
-                  isAdmin={isAdmin}
+                  isAdmin={!!account && isAdmin}
                   disabled={disabledTools}
                 />
               ) : (
@@ -533,7 +544,7 @@ function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
   const years = Array.from({ length: 60 }, (_, i) => thisYear - 5 - i);
   const days = Array.from({ length: 31 }, (_, i) => i + 1);
 
-  const digits = phone.replace(/\D/g, "");
+  const digits = normalizePhone(phone);
 
   async function submit() {
     if (busy) return;
@@ -577,6 +588,7 @@ function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
         ok?: boolean;
         phone?: string;
         firstName?: string;
+        isAdmin?: boolean;
         error?: string;
       };
       if (!res.ok || !data.ok) {
@@ -593,6 +605,7 @@ function RegisterScreen({ onDone }: { onDone: (a: Account) => void }) {
       onDone({
         phone: data.phone ?? digits,
         firstName: data.firstName ?? firstName.trim(),
+        isAdmin: !!data.isAdmin,
       });
     } catch {
       setError(t.connErr);
@@ -1282,7 +1295,7 @@ function ToolPicker({
 }) {
   const { t } = useT();
   const visible = TOOLS.filter(
-    (s) => (s.id !== "admin" || isAdmin) && !disabled.includes(s.id),
+    (s) => s.id === "admin" ? isAdmin : !disabled.includes(s.id),
   );
   return (
     <div>

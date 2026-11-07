@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, useT } from "@/lib/ui";
 
 type Flag = { id: string; username: string; text: string; word: string; created_at: string };
@@ -25,8 +25,7 @@ type Stats = {
 
 export default function AdminPanel({ username }: { username: string }) {
   const { t } = useT();
-  const [pass, setPass] = useState("");
-  const [authed, setAuthed] = useState(false);
+  const [authed, setAuthed] = useState(true);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const [data, setData] = useState<Stats | null>(null);
@@ -40,11 +39,15 @@ export default function AdminPanel({ username }: { username: string }) {
       const res = await fetch("/api/public/admin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, pass, action: "stats", ...payload }),
+        body: JSON.stringify({ action: "stats", ...payload }),
       });
       if (res.status === 401) {
         setErr(t.admNoAccess);
         setAuthed(false);
+        return;
+      }
+      if (!res.ok) {
+        setErr(t.errorGeneric);
         return;
       }
       const json = (await res.json()) as Stats;
@@ -57,33 +60,13 @@ export default function AdminPanel({ username }: { username: string }) {
     }
   }
 
-  if (!authed) {
-    return (
-      <div className="space-y-3">
-        <p className="text-sm opacity-70">{t.admHint}</p>
-        <p className="text-xs opacity-60">{t.admHintPhone}</p>
-        <input
-          type="password"
-          value={pass}
-          onChange={(e) => setPass(e.target.value)}
-          placeholder={t.password}
-          className="gw-input rounded-2xl px-4 py-2.5 text-sm"
-        />
-        <button
-          type="button"
-          disabled={busy || !pass}
-          onClick={() => void call()}
-          className="gw-btn w-full rounded-2xl px-4 py-2.5 text-sm font-bold disabled:opacity-50"
-        >
-          {t.signIn}
-        </button>
-        {err && <div className="gw-note gw-note-bad text-sm">{err}</div>}
-      </div>
-    );
-  }
+  useEffect(() => { void call(); }, [username]);
+
+  if (!authed) return <div role="alert" className="gw-note gw-note-bad text-sm">{t.admNoAccess}</div>;
 
   return (
     <div className="space-y-4">
+      {err && <div role="alert" className="gw-note gw-note-bad text-sm">{err}</div>}
       <div className="grid grid-cols-3 gap-2">
         {[
           { label: t.admOnline, value: data?.online ?? 0 },
