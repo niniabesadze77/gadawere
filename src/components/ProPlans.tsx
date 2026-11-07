@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card, useT } from "@/lib/ui";
+import { Button } from "@/components/ui/button";
 
 const IBAN = "GE63BG0000000529113336";
 
@@ -16,7 +17,7 @@ export default function ProPlans({ username }: { username: string }) {
   const [active, setActive] = useState(false);
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [tab, setTab] = useState<"card" | "bank">("card");
+  const [tab, setTab] = useState<"card" | "bank">("bank");
   const [card, setCard] = useState("");
   const [exp, setExp] = useState("");
   const [cvc, setCvc] = useState("");
@@ -126,14 +127,14 @@ export default function ProPlans({ username }: { username: string }) {
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  onClick={() => setWalletNote(true)}
+                  disabled
                   className="rounded-2xl bg-black px-3 py-2.5 text-sm font-bold text-white"
                 >
                    Pay
                 </button>
                 <button
                   type="button"
-                  onClick={() => setWalletNote(true)}
+                  disabled
                   className="gw-glass rounded-2xl px-3 py-2.5 text-sm font-bold"
                 >
                   G Pay
@@ -144,6 +145,7 @@ export default function ProPlans({ username }: { username: string }) {
               )}
 
               <input
+                disabled
                 value={card}
                 inputMode="numeric"
                 onChange={(e) =>
@@ -160,12 +162,14 @@ export default function ProPlans({ username }: { username: string }) {
               />
               <div className="grid grid-cols-2 gap-2">
                 <input
+                  disabled
                   value={exp}
                   onChange={(e) => setExp(e.target.value.slice(0, 5))}
                   placeholder={t.payExpiry}
                   className="gw-input rounded-2xl px-3 py-2.5 text-sm"
                 />
                 <input
+                  disabled
                   value={cvc}
                   inputMode="numeric"
                   onChange={(e) => setCvc(e.target.value.replace(/\D/g, "").slice(0, 4))}
@@ -174,25 +178,19 @@ export default function ProPlans({ username }: { username: string }) {
                 />
               </div>
               <input
+                disabled
                 value={holder}
                 onChange={(e) => setHolder(e.target.value)}
                 placeholder={t.payHolder}
                 className="gw-input w-full rounded-2xl px-3 py-2.5 text-sm"
               />
-              <button
+              <Button
                 type="button"
-                disabled={paying || card.replace(/\s/g, "").length < 16 || !exp || !cvc || !holder}
-                onClick={() => {
-                  setPaying(true);
-                  setTimeout(() => {
-                    setPaying(false);
-                    setPaid(true);
-                  }, 1600);
-                }}
+                disabled
                 className="gw-btn w-full rounded-2xl px-4 py-2.5 text-sm font-bold disabled:opacity-50"
               >
                 {paying ? t.payProcessing : `${t.payNow} · ${sub.plan === "premium" ? "125₾" : "25₾"}`}
-              </button>
+              </Button>
               {paid && <div className="gw-note text-sm">{t.paySent}</div>}
             </div>
           ) : (
